@@ -9,7 +9,6 @@
 //
 
 import UIKit
-import LoomitOfferwallCore
 
 // MARK: - Section model
 

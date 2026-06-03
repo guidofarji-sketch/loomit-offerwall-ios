@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import LoomitOfferwallCore
 
 @MainActor
 final class ProvidersViewController: UIViewController {

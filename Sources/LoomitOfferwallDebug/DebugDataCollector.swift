@@ -19,7 +19,6 @@
 //
 
 import Foundation
-import LoomitOfferwallCore
 
 /// Nivel de severidad de un `DebugEvent` (no confundir con `LogLevel` del logger).
 public enum DebugEventLevel: String, Sendable {

@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import LoomitOfferwallCore
 
 @MainActor
 final class CacheViewController: UIViewController {

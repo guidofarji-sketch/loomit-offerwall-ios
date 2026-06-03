@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import LoomitOfferwallCore
 
 /// View controller principal del debug panel con tabs
 @MainActor
