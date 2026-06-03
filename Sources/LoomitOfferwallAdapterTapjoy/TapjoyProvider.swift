@@ -484,7 +484,7 @@ public final class TapjoyProvider: NSObject, OfferwallProvider, @preconcurrency 
 
 // MARK: - Extensions
 
-extension String {
+fileprivate extension String {
     var nonEmpty: String? {
         isEmpty ? nil : self
     }
