@@ -21,7 +21,9 @@ Pod::Spec.new do |s|
   }
 
   # ─────────────────────────────────────────────────────────────────────────────
-  # Core — required. Includes AdapterAPI + Core SDK.
+  # Core — AdapterAPI + Core compiled as one pod target.
+  # AdapterAPI sources are included here directly so Swift resolves all types
+  # without needing a separate 'import LoomitOfferwallAdapterAPI' statement.
   # ─────────────────────────────────────────────────────────────────────────────
   s.subspec 'Core' do |core|
     core.source_files = [
@@ -44,20 +46,21 @@ Pod::Spec.new do |s|
 
   # ─────────────────────────────────────────────────────────────────────────────
   # Tapjoy — optional adapter for Tapjoy/Unity Offerwall
-  # Requires TapjoySDK ~> 14.0 from CocoaPods trunk
+  # Requires TapjoySDK ~> 14.0 from CocoaPods trunk (static xcframework)
+  # Note: Podfile must use: use_frameworks! :linkage => :static
   # ─────────────────────────────────────────────────────────────────────────────
   s.subspec 'Tapjoy' do |tapjoy|
     tapjoy.source_files = 'Sources/LoomitOfferwallAdapterTapjoy/**/*.swift'
     tapjoy.dependency 'LoomitOfferwall/Core'
     tapjoy.dependency 'TapjoySDK', '~> 14.0'
+    tapjoy.pod_target_xcconfig = { 'OTHER_LDFLAGS' => '-ObjC' }
   end
 
   # ─────────────────────────────────────────────────────────────────────────────
-  # MyChips — optional adapter for MyChips/MAF Offerwall
-  # Uses vendored xcframework (MyChips has no CocoaPod)
+  # MyChips — optional adapter. Uses vendored xcframework (no CocoaPod available)
   # ─────────────────────────────────────────────────────────────────────────────
   s.subspec 'MyChips' do |mychips|
-    mychips.source_files = 'Sources/LoomitOfferwallAdapterMyChips/**/*.swift'
+    mychips.source_files       = 'Sources/LoomitOfferwallAdapterMyChips/**/*.swift'
     mychips.dependency 'LoomitOfferwall/Core'
     mychips.vendored_frameworks = 'Frameworks/MyChipsSdk.xcframework'
   end

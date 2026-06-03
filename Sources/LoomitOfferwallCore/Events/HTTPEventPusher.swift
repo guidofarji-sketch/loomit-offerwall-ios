@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import LoomitOfferwallAdapterAPI
 
 public final class HTTPEventPusher: OfferwallEventPusher {
 

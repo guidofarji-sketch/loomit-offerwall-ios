@@ -14,7 +14,6 @@
 /// Handles connection, placement management, and offerwall display with proper error handling
 import Foundation
 import UIKit
-import LoomitOfferwallAdapterAPI
 import Tapjoy
 
 @MainActor

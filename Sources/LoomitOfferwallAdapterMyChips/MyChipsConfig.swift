@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import LoomitOfferwallAdapterAPI
 
 /// Género del usuario (paridad con `MCGenderEnum` del SDK MyChips).
 public enum MyChipsGender: String, Sendable, Equatable {

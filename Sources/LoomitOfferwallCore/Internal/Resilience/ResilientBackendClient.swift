@@ -14,7 +14,6 @@
 //
 
 import Foundation
-import LoomitOfferwallAdapterAPI
 
 public actor ResilientBackendClient: BackendClient {
 

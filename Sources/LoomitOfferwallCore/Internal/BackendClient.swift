@@ -11,7 +11,6 @@
 //
 
 import Foundation
-import LoomitOfferwallAdapterAPI
 
 /// Cliente backend abstracto.
 ///

@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import LoomitOfferwallAdapterAPI
 
 /// Configuración tipada del provider Tapjoy (alias: Unity Offerwall).
 ///

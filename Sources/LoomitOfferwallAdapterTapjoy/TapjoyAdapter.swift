@@ -14,7 +14,6 @@
 //
 
 import Foundation
-import LoomitOfferwallAdapterAPI
 
 public final class TapjoyAdapter: OfferwallAdapter, @unchecked Sendable {
 

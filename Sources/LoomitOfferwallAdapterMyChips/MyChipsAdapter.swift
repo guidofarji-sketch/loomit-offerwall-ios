@@ -21,7 +21,6 @@
 //
 
 import Foundation
-import LoomitOfferwallAdapterAPI
 
 public final class MyChipsAdapter: OfferwallAdapter, @unchecked Sendable {
 

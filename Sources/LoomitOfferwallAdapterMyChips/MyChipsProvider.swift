@@ -17,7 +17,6 @@
 
 import Foundation
 import UIKit
-import LoomitOfferwallAdapterAPI
 
 /// Listener opcional para reward checks (Self-Managed Currency mode).
 ///
