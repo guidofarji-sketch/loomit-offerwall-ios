@@ -246,26 +246,34 @@ public actor OfferwallSdk {
 
     /// Overrides de experimentos persistidos (paridad con Android)
     private var _experimentOverrides: [String: String]?
+    private var experimentOverrides: [String: String] {
+        get {
+            if let cached = _experimentOverrides {
+                return cached
+            }
+            let (overrides, _) = Self.loadExperimentOverridesStatic()
+            _experimentOverrides = overrides
+            return overrides
+        }
+        set {
+            _experimentOverrides = newValue
+        }
+    }
 
     /// IDs de experimentos para overrides (paridad con Android)
     private var _experimentOverrideIds: [String: String]?
-
-    private var experimentOverrides: [String: String] {
-        if let cached = _experimentOverrides {
-            return cached
-        }
-        let (overrides, _) = Self.loadExperimentOverridesStatic()
-        _experimentOverrides = overrides
-        return overrides
-    }
-
     private var experimentOverrideIds: [String: String] {
-        if let cached = _experimentOverrideIds {
-            return cached
+        get {
+            if let cached = _experimentOverrideIds {
+                return cached
+            }
+            let (_, ids) = Self.loadExperimentOverridesStatic()
+            _experimentOverrideIds = ids
+            return ids
         }
-        let (_, ids) = Self.loadExperimentOverridesStatic()
-        _experimentOverrideIds = ids
-        return ids
+        set {
+            _experimentOverrideIds = newValue
+        }
     }
 
     // MARK: - Init
