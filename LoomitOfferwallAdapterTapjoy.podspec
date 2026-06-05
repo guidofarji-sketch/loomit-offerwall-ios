@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'LoomitOfferwallAdapterTapjoy'
-  s.version          = '0.3.0-beta.27'
+  s.version          = '0.3.0-beta.28'
   s.summary          = 'Loomit Offerwall Adapter for Tapjoy'
   s.description      = <<-DESC
     Tapjoy offerwall adapter for Loomit Offerwall SDK iOS.

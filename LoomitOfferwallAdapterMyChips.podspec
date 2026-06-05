@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'LoomitOfferwallAdapterMyChips'
-  s.version          = '0.3.0-beta.27'
+  s.version          = '0.3.0-beta.28'
   s.summary          = 'Loomit Offerwall Adapter for MyChips/MAF'
   s.description      = <<-DESC
     MyChips/MAF offerwall adapter for Loomit Offerwall SDK iOS.

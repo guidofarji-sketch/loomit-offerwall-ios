@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'LoomitOfferwallCore'
-  s.version          = '0.3.0-beta.27'
+  s.version          = '0.3.0-beta.28'
   s.summary          = 'Loomit Offerwall SDK Core for iOS'
   s.description      = <<-DESC
     Loomit Offerwall SDK Core provides the unified monetization layer.

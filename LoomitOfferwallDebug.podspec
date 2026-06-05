@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'LoomitOfferwallDebug'
-  s.version          = '0.3.0-beta.27'
+  s.version          = '0.3.0-beta.28'
   s.summary          = 'Loomit Offerwall Debug Suite for iOS'
   s.description      = <<-DESC
     Debug suite for Loomit Offerwall SDK iOS.
