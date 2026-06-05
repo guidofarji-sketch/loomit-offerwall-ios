@@ -28,6 +28,8 @@ import UIKit
     }
     private var unityGameObject: String = "LoomitOfferwallManager"
     private var isSdkInitialized: Bool = false
+    private var cachedUserId: String?
+    private var cachedXifa: String = ""
 
     // MARK: - Unity Callbacks (NSNotificationCenter decoupling)
     // The wrapper lives inside the LoomitOfferwall pod and cannot link against
@@ -106,6 +108,10 @@ import UIKit
             // Register adapters dynamically (pods may or may not be present)
             await self.registerAvailableAdapters()
 
+            // Cache synchronous values so getters don't block Unity's main thread
+            self.cachedUserId = await self.sdk.getPublisherUserId()
+            self.cachedXifa = await self.sdk.xifa()
+
             self.isSdkInitialized = true
         }
     }
@@ -136,36 +142,27 @@ import UIKit
     // MARK: - Public API: User Management
 
     @objc public func setUserId(_ userId: String?) {
-        Task { await self.sdk.setPublisherUserId(userId) }
+        Task {
+            await self.sdk.setPublisherUserId(userId)
+            self.cachedUserId = userId
+        }
     }
 
     @objc public func clearUserId() {
-        Task { await self.sdk.clearPublisherUserId() }
+        Task {
+            await self.sdk.clearPublisherUserId()
+            self.cachedUserId = nil
+        }
     }
 
     @objc public func getUserId() -> String? {
-        let semaphore = DispatchSemaphore(value: 0)
-        var result: String?
-        // Use Task.detached to avoid deadlock when called from main thread.
-        // The bridged .m runs on Unity's main thread; Task{} inherits the
-        // actor context and could starve. Task.detached runs on a pool thread.
-        Task.detached {
-            result = await self.sdk.getPublisherUserId()
-            semaphore.signal()
-        }
-        semaphore.wait()
-        return result
+        // Return cached value — synchronous, no blocking.
+        return self.cachedUserId
     }
 
     @objc public func getXifa() -> String {
-        let semaphore = DispatchSemaphore(value: 0)
-        var result: String = ""
-        Task.detached {
-            result = await self.sdk.xifa()
-            semaphore.signal()
-        }
-        semaphore.wait()
-        return result
+        // Return cached value — synchronous, no blocking.
+        return self.cachedXifa
     }
 
     // MARK: - Public API: Show/Close
