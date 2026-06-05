@@ -18,6 +18,8 @@ Pod::Spec.new do |s|
 
   s.source_files = 'LoomitOfferwall/LoomitOfferwallCore/**/*.swift'
 
+  s.dependency 'LoomitOfferwallAdapterAPI'
+
   s.resource_bundles = {
     'LoomitOfferwallCore' => ['Resources/**/*']
   }
