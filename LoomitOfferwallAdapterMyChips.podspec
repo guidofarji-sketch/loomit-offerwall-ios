@@ -19,7 +19,8 @@ Pod::Spec.new do |s|
   s.source_files = 'LoomitOfferwallAdapterMyChips/Sources/LoomitOfferwallAdapterMyChips/**/*.swift'
 
   s.dependency 'LoomitOfferwallAdapterAPI', '= 0.3.0-beta.27'
-  s.dependency 'MyChipsSdk', '~> 1.1.0'
+
+  s.vendored_frameworks = 'Frameworks/MyChipsSdk.xcframework'
 
   s.static_framework = true
 end
