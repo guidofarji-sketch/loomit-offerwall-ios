@@ -215,7 +215,7 @@ import UIKit
     @objc public func hasAvailableOfferwall() -> Bool {
         let semaphore = DispatchSemaphore(value: 0)
         var result = false
-        Task {
+        Task.detached {
             result = await self.sdk.hasAvailableOfferwall()
             semaphore.signal()
         }
@@ -226,7 +226,7 @@ import UIKit
     @objc public func getActiveProviderName() -> String? {
         let semaphore = DispatchSemaphore(value: 0)
         var result: String?
-        Task {
+        Task.detached {
             result = await self.sdk.getActiveProviderName()
             semaphore.signal()
         }
@@ -237,7 +237,7 @@ import UIKit
     @objc public func getAvailableProviders() -> String {
         let semaphore = DispatchSemaphore(value: 0)
         var result: [String] = []
-        Task {
+        Task.detached {
             result = await self.sdk.getAvailableProviders()
             semaphore.signal()
         }
@@ -272,7 +272,7 @@ import UIKit
     @objc public func getLastSegmentName() -> String? {
         let semaphore = DispatchSemaphore(value: 0)
         var result: String?
-        Task {
+        Task.detached {
             result = await self.sdk.getLastSegmentName()
             semaphore.signal()
         }
@@ -283,7 +283,7 @@ import UIKit
     @objc public func hasActiveExperiments() -> Bool {
         let semaphore = DispatchSemaphore(value: 0)
         var result = false
-        Task {
+        Task.detached {
             result = await self.sdk.hasActiveExperiments()
             semaphore.signal()
         }
@@ -294,7 +294,7 @@ import UIKit
     @objc public func getLastExperimentAssignments() -> String {
         let semaphore = DispatchSemaphore(value: 0)
         var result: [OfferwallSdk.ExperimentAssignment] = []
-        Task {
+        Task.detached {
             result = await self.sdk.getLastExperimentAssignments()
             semaphore.signal()
         }
@@ -320,7 +320,7 @@ import UIKit
     @objc public func getLastRawConfigResponse() -> String? {
         let semaphore = DispatchSemaphore(value: 0)
         var result: String?
-        Task {
+        Task.detached {
             result = await self.sdk.getLastRawConfigResponse()
             semaphore.signal()
         }
@@ -331,7 +331,7 @@ import UIKit
     @objc public func getProviderPlanJson() -> String {
         let semaphore = DispatchSemaphore(value: 0)
         var result: [ProviderPlanEntry] = []
-        Task {
+        Task.detached {
             result = await self.sdk.getProviderPlan()
             semaphore.signal()
         }
@@ -355,7 +355,7 @@ import UIKit
     @objc public func getLastConfigSource() -> String? {
         let semaphore = DispatchSemaphore(value: 0)
         var result: String?
-        Task {
+        Task.detached {
             result = await self.sdk.getLastConfigSource()
             semaphore.signal()
         }
@@ -366,7 +366,7 @@ import UIKit
     @objc public func getConfigRequestPreview(clientId: String, appId: String?) -> String {
         let semaphore = DispatchSemaphore(value: 0)
         var result: String = ""
-        Task {
+        Task.detached {
             result = await self.sdk.getConfigRequestPreview(clientId: clientId, appId: appId?.isEmpty == true ? nil : appId)
             semaphore.signal()
         }
@@ -435,7 +435,7 @@ import UIKit
     @objc public func isDebuggingEnabled() -> Bool {
         let semaphore = DispatchSemaphore(value: 0)
         var result = false
-        Task {
+        Task.detached {
             result = await self.sdk.isDebuggingEnabled()
             semaphore.signal()
         }
