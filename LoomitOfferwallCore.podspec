@@ -14,7 +14,6 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '14.0'
   s.swift_versions = ['5.0', '5.9', '6.0']
 
-  s.static_framework = true
   s.module_name = 'LoomitOfferwallCore'
 
   s.source_files = 'LoomitOfferwall/Sources/LoomitOfferwallCore/**/*.swift'

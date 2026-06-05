@@ -16,7 +16,6 @@ Pod::Spec.new do |s|
 
   s.source_files = 'LoomitOfferwallAdapterAPI/Sources/LoomitOfferwallAdapterAPI/**/*.swift'
 
-  s.static_framework = true
   s.module_name = 'LoomitOfferwallAdapterAPI'
 
   s.pod_target_xcconfig = {

@@ -18,7 +18,6 @@ Pod::Spec.new do |s|
 
   s.dependency 'LoomitOfferwallCore'
 
-  s.static_framework = true
   s.module_name = 'LoomitOfferwallDebug'
 
   s.pod_target_xcconfig = {
