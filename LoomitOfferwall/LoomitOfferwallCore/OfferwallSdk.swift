@@ -185,6 +185,12 @@ public actor OfferwallSdk {
     /// Guard contra double-show (§10.11 anti-pattern prevention, paridad con Android).
     private var isShowingOfferwall: Bool = false
 
+    /// Guard contra callbacks duplicados del mismo provider (defensa en profundidad).
+    /// Un adapter con bugs de NotificationCenter o delegate puede emitir didShow/didClose
+    /// múltiples veces; estos flags previenen eventos duplicados.
+    private var hasProviderReportedShow = false
+    private var hasProviderReportedClose = false
+
     // MARK: - Availability Barrier Constants (paridad con Android)
 
     /// Debounce delay antes de emitir availability snapshot.
@@ -1994,6 +2000,8 @@ public actor OfferwallSdk {
         // CRITICAL: Set flag immediately after guard, before any await
         // This prevents race conditions when multiple show() calls arrive concurrently
         isShowingOfferwall = true
+        hasProviderReportedShow = false
+        hasProviderReportedClose = false
 
         // If providerOverride is specified, find that specific provider
         if let override = providerOverride {
@@ -2243,8 +2251,14 @@ public actor OfferwallSdk {
 
     /// Called when a provider confirms the offerwall is visible.
     func handleProviderDidShow(providerKey: String) async {
+        guard !hasProviderReportedShow else {
+            print("[OfferwallSdk] ⚠️ Duplicate providerDidShow ignored for \(providerKey)")
+            return
+        }
+        hasProviderReportedShow = true
+
         let lcId = pendingShowLifecycleId != 0 ? pendingShowLifecycleId : currentLifecycleId
-        
+
         // Use provider from plan for consistency (providerKey from adapter may differ)
         let planProvider = providerPlan.indices.contains(currentProviderIndex)
             ? providerPlan[currentProviderIndex].providerId
@@ -2319,9 +2333,15 @@ public actor OfferwallSdk {
 
     /// Called when the offerwall is closed.
     func handleProviderDidClose(providerKey: String) async {
+        guard !hasProviderReportedClose else {
+            print("[OfferwallSdk] ⚠️ Duplicate providerDidClose ignored for \(providerKey)")
+            return
+        }
+        hasProviderReportedClose = true
+
         // Reset showing state (guard for double-show)
         isShowingOfferwall = false
-        
+
         let lcIdForEvent = pendingShowLifecycleId != 0 ? pendingShowLifecycleId : currentLifecycleId
         
         // Use provider from plan for consistency (providerKey from adapter may differ)

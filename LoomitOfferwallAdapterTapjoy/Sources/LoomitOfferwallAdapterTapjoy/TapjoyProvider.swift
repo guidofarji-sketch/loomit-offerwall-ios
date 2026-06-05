@@ -56,6 +56,10 @@ public final class TapjoyProvider: NSObject, OfferwallProvider, @preconcurrency 
     private weak var providerListener: OfferwallProviderListener?
     private var currentPlacement: TJPlacement?
 
+    /// Guards against duplicate show/close callbacks from TJPlacementDelegate
+    private var hasReportedShow = false
+    private var hasReportedClose = false
+
     /// Static reference to the last created instance (for testing)
     @MainActor
     public static var lastInstance: TapjoyProvider?
@@ -141,7 +145,19 @@ public final class TapjoyProvider: NSObject, OfferwallProvider, @preconcurrency 
         return .success(())
     }
 
+    private var hasRegisteredObservers = false
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
     private func setupConnectionNotifications() {
+        // Prevent duplicate observers if initialize() is called multiple times
+        if hasRegisteredObservers {
+            NotificationCenter.default.removeObserver(self)
+        }
+        hasRegisteredObservers = true
+
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(tjcConnectSuccess),
@@ -208,6 +224,10 @@ public final class TapjoyProvider: NSObject, OfferwallProvider, @preconcurrency 
         from presenter: UIViewController,
         adSpace: String?
     ) async -> Result<Void, OfferwallError> {
+        // Reset callback guards for a fresh show session
+        hasReportedShow = false
+        hasReportedClose = false
+
         guard state == .initialized else {
             let reason: String
             switch state {
@@ -435,12 +455,22 @@ public final class TapjoyProvider: NSObject, OfferwallProvider, @preconcurrency 
 
     public func contentDidAppear(_ placement: TJPlacement) {
         print("[TapjoyProvider] 🔥 contentDidAppear called for placement: \(placement.placementName)")
+        guard !hasReportedShow else {
+            print("[TapjoyProvider] ⚠️ contentDidAppear duplicate ignored")
+            return
+        }
+        hasReportedShow = true
         providerListener?.providerDidShow(providerKey)
     }
 
     public func contentDidDisappear(_ placement: TJPlacement) {
         print("[TapjoyProvider] 🔥 contentDidDisappear called for placement: \(placement.placementName)")
-        
+        guard !hasReportedClose else {
+            print("[TapjoyProvider] ⚠️ contentDidDisappear duplicate ignored")
+            return
+        }
+        hasReportedClose = true
+
         // Add delay to prevent firstResponder crash when Unity retakes control
         // Tapjoy needs time to clean up its window before Unity's window becomes key again
         Task { @MainActor [weak self] in
@@ -448,7 +478,7 @@ public final class TapjoyProvider: NSObject, OfferwallProvider, @preconcurrency 
             guard let self = self else { return }
             self.providerListener?.providerDidClose(self.providerKey)
         }
-        
+
         // Request new content after dismiss
         placement.requestContent()
         setContentAvailable(false)
