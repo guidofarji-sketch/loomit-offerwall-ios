@@ -80,7 +80,7 @@ import UIKit
 
         print("[LoomitBridgeWrapper] initialize(gameObject=\(gameObject), clientId=\(clientId))")
 
-        Task {
+        Task { @MainActor in
             // Guard: Skip duplicate initialization
             if self.isSdkInitialized {
                 print("[LoomitBridgeWrapper] SDK already initialized (guard preventing duplicate init)")
@@ -110,11 +110,11 @@ import UIKit
     // MARK: - Public API: User Management
 
     @objc public func setUserId(_ userId: String?) {
-        Task { await sdk.setPublisherUserId(userId) }
+        Task { @MainActor in await sdk.setPublisherUserId(userId) }
     }
 
     @objc public func clearUserId() {
-        Task { await sdk.clearPublisherUserId() }
+        Task { @MainActor in await sdk.clearPublisherUserId() }
     }
 
     @objc public func getUserId() -> String? {
@@ -172,7 +172,7 @@ import UIKit
     }
 
     @objc public func close() {
-        Task { await sdk.close() }
+        Task { @MainActor in await sdk.close() }
     }
 
     @objc public func failoverToNext() {
@@ -225,7 +225,7 @@ import UIKit
 
     @objc public func fetchConfig() {
         print("[LoomitBridgeWrapper] fetchConfig: USER REQUEST")
-        Task {
+        Task { @MainActor in
             do {
                 _ = try await sdk.fetchConfig()
                 print("[LoomitBridgeWrapper] fetchConfig: SUCCESS")
@@ -238,7 +238,7 @@ import UIKit
 
     @objc public func initializeProviders() {
         print("[LoomitBridgeWrapper] initializeProviders: USER REQUEST")
-        Task {
+        Task { @MainActor in
             await sdk.initAllFromPlan()
             print("[LoomitBridgeWrapper] initializeProviders: COMPLETED")
         }
@@ -356,21 +356,21 @@ import UIKit
         guard !sanitizedKey.isEmpty else { return }
         let sanitizedValue = value?.trimmingCharacters(in: .whitespacesAndNewlines)
         let finalValue = sanitizedValue?.isEmpty == true ? nil : sanitizedValue
-        Task { await sdk.setCustomProperty(sanitizedKey, value: finalValue) }
+        Task { @MainActor in await sdk.setCustomProperty(sanitizedKey, value: finalValue) }
     }
 
     @objc public func removeCustomProperty(key: String) {
-        Task { await sdk.removeCustomProperty(key) }
+        Task { @MainActor in await sdk.removeCustomProperty(key) }
     }
 
     @objc public func clearCustomProperties() {
-        Task { await sdk.clearCustomProperties() }
+        Task { @MainActor in await sdk.clearCustomProperties() }
     }
 
     @objc public func setCustomPropertiesFromJson(json: String) {
         guard let data = json.data(using: .utf8),
               let dict = try? JSONSerialization.jsonObject(with: data) as? [String: String] else { return }
-        Task { await sdk.setCustomProperties(dict) }
+        Task { @MainActor in await sdk.setCustomProperties(dict) }
     }
 
     // MARK: - Public API: Privacy
@@ -379,7 +379,7 @@ import UIKit
                                           tcfConsentString: String?, usPrivacyString: String?) {
         let tcf = tcfConsentString?.isEmpty == true ? nil : tcfConsentString
         let usPrivacy = usPrivacyString?.isEmpty == true ? nil : usPrivacyString
-        Task {
+        Task { @MainActor in
             await sdk.setPrivacy(
                 tcfConsentString: tcf,
                 usPrivacyString: usPrivacy,
@@ -394,11 +394,11 @@ import UIKit
 
     @objc public func setAdvertisingId(_ advertisingId: String?) {
         let adId = advertisingId?.isEmpty == true ? nil : advertisingId
-        Task { await sdk.setAdvertisingId(adId) }
+        Task { @MainActor in await sdk.setAdvertisingId(adId) }
     }
 
     @objc public func setHasAdvertisingId(_ has: Bool) {
-        Task { await sdk.setHasAdvertisingId(has) }
+        Task { @MainActor in await sdk.setHasAdvertisingId(has) }
     }
 
     // MARK: - Public API: Debug
@@ -408,7 +408,7 @@ import UIKit
         // which crashes when accessing UserDefaults from a concurrent queue.
         // The SDK core still accepts the flag; the wrapper avoids the
         // DebugPanel path that is not thread-safe in the current SDK version.
-        Task { await sdk.setDebuggingEnabled(enabled) }
+        Task { @MainActor in await sdk.setDebuggingEnabled(enabled) }
     }
 
     @objc public func isDebuggingEnabled() -> Bool {
@@ -432,7 +432,7 @@ import UIKit
 
     @objc public func setEnvironment(_ envString: String) {
         print("[LoomitBridgeWrapper] setEnvironment(\(envString))")
-        Task {
+        Task { @MainActor in
             let environment: BackendEnvironment
             switch envString.lowercased() {
             case "live", "production":
