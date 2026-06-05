@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'LoomitOfferwallDebug'
-  s.version          = '0.3.0-beta.26'
+  s.version          = '0.3.0-beta.27'
   s.summary          = 'Loomit Offerwall Debug Suite for iOS'
   s.description      = <<-DESC
     Debug suite for Loomit Offerwall SDK iOS.
@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
 
   s.source_files = 'LoomitOfferwallDebug/Sources/LoomitOfferwallDebug/**/*.swift'
 
-  s.dependency 'LoomitOfferwall', '~> 0.3.0-beta'
+  s.dependency 'LoomitOfferwall', '= 0.3.0-beta.27'
 
   s.static_framework = true
 end

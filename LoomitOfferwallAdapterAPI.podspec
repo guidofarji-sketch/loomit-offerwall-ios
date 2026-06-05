@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'LoomitOfferwallAdapterAPI'
-  s.version          = '0.3.0-beta.26'
+  s.version          = '0.3.0-beta.27'
   s.summary          = 'Loomit Offerwall Adapter API for iOS'
   s.description      = <<-DESC
     Adapter API interface for Loomit Offerwall SDK iOS.

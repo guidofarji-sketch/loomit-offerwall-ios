@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'LoomitOfferwallAdapterTapjoy'
-  s.version          = '0.3.0-beta.26'
+  s.version          = '0.3.0-beta.27'
   s.summary          = 'Loomit Offerwall Adapter for Tapjoy'
   s.description      = <<-DESC
     Tapjoy offerwall adapter for Loomit Offerwall SDK iOS.
@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
 
   s.source_files = 'LoomitOfferwallAdapterTapjoy/Sources/LoomitOfferwallAdapterTapjoy/**/*.swift'
 
-  s.dependency 'LoomitOfferwallAdapterAPI', '~> 0.3.0-beta'
+  s.dependency 'LoomitOfferwallAdapterAPI', '= 0.3.0-beta.27'
   s.dependency 'TapjoySDK', '~> 14.7.0'
 
   s.static_framework = true
