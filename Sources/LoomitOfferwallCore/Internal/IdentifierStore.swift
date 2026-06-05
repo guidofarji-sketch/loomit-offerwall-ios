@@ -61,10 +61,8 @@ public final class IdentifierStore: IdentifierStoring, @unchecked Sendable {
     private let bundle: Bundle
     private let idfvProvider: () -> String?
 
-    /// Serial queue para todas las operaciones de UserDefaults.
-    /// UserDefaults no es thread-safe internamente; usar un serial queue
-    /// garantiza que todas las lecturas/escrituras ocurran en secuencia.
-    private let queue = DispatchQueue(label: "com.loomit.offerwall.identifierstore")
+    /// Lock para inicialización lazy thread-safe del xifa.
+    private let lock = NSLock()
 
     /// Cache en memoria del fingerprint (no cambia durante lifetime de la app).
     private var cachedFingerprint: String?
@@ -82,15 +80,16 @@ public final class IdentifierStore: IdentifierStoring, @unchecked Sendable {
     // MARK: - XIFA
 
     public func xifa() -> String {
-        return queue.sync {
-            if let existing = defaults.string(forKey: Keys.xifa), !existing.isEmpty {
-                return existing
-            }
+        lock.lock()
+        defer { lock.unlock() }
 
-            let new = UUID().uuidString.lowercased()
-            defaults.set(new, forKey: Keys.xifa)
-            return new
+        if let existing = defaults.string(forKey: Keys.xifa), !existing.isEmpty {
+            return existing
         }
+
+        let new = UUID().uuidString.lowercased()
+        defaults.set(new, forKey: Keys.xifa)
+        return new
     }
 
     // MARK: - IDFV
@@ -106,15 +105,16 @@ public final class IdentifierStore: IdentifierStoring, @unchecked Sendable {
             return real
         }
 
-        return queue.sync {
-            if let existing = defaults.string(forKey: Keys.idfvFallback), !existing.isEmpty {
-                return existing
-            }
+        lock.lock()
+        defer { lock.unlock() }
 
-            let new = UUID().uuidString.lowercased()
-            defaults.set(new, forKey: Keys.idfvFallback)
-            return new
+        if let existing = defaults.string(forKey: Keys.idfvFallback), !existing.isEmpty {
+            return existing
         }
+
+        let new = UUID().uuidString.lowercased()
+        defaults.set(new, forKey: Keys.idfvFallback)
+        return new
     }
 
     // MARK: - Bundle ID
@@ -126,21 +126,25 @@ public final class IdentifierStore: IdentifierStoring, @unchecked Sendable {
     // MARK: - Device fingerprint v1
 
     public func deviceFingerprint() -> String {
-        return queue.sync {
-            if let cached = cachedFingerprint {
-                return cached
-            }
-
-            let idfv = idfvOrFallback()
-            let bundleId = bundleIdentifier() ?? "unknown.bundle"
-            let input = "\(idfv):\(bundleId)"
-
-            let digest = SHA256.hash(data: Data(input.utf8))
-            let hex = digest.map { String(format: "%02x", $0) }.joined()
-
-            cachedFingerprint = hex
-            return hex
+        lock.lock()
+        if let cached = cachedFingerprint {
+            lock.unlock()
+            return cached
         }
+        lock.unlock()
+
+        let idfv = idfvOrFallback()
+        let bundleId = bundleIdentifier() ?? "unknown.bundle"
+        let input = "\(idfv):\(bundleId)"
+
+        let digest = SHA256.hash(data: Data(input.utf8))
+        let hex = digest.map { String(format: "%02x", $0) }.joined()
+
+        lock.lock()
+        cachedFingerprint = hex
+        lock.unlock()
+
+        return hex
     }
 
     // MARK: - Test helpers (internal)
@@ -148,8 +152,8 @@ public final class IdentifierStore: IdentifierStoring, @unchecked Sendable {
     /// Solo para tests: limpia el cache de fingerprint en memoria.
     /// No afecta UserDefaults.
     func resetMemoryCacheForTesting() {
-        queue.sync {
-            cachedFingerprint = nil
-        }
+        lock.lock()
+        cachedFingerprint = nil
+        lock.unlock()
     }
 }

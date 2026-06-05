@@ -22,6 +22,7 @@ import Foundation
 #if canImport(UIKit)
 import UIKit
 #endif
+import LoomitOfferwallAdapterAPI
 
 /// Entry point principal del SDK. Singleton actor.
 ///
@@ -40,6 +41,7 @@ import UIKit
 ///     }
 /// }
 /// ```
+@MainActor
 public actor OfferwallSdk {
 
     // MARK: - Singleton
