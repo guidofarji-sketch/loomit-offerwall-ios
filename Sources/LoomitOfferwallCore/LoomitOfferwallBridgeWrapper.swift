@@ -22,7 +22,9 @@ import UIKit
 
     @objc public static let shared = LoomitOfferwallBridgeWrapper()
 
-    private let sdk = OfferwallSdk.shared
+    private var sdk: OfferwallSdk {
+        return OfferwallSdk.shared
+    }
     private var unityGameObject: String = "LoomitOfferwallManager"
     private var isSdkInitialized: Bool = false
 

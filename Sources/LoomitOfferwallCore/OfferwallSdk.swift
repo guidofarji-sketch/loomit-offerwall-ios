@@ -245,10 +245,28 @@ public actor OfferwallSdk {
     private var lastExperimentAssignments: [ExperimentAssignment] = []
 
     /// Overrides de experimentos persistidos (paridad con Android)
-    private var experimentOverrides: [String: String] = [:]
+    private var _experimentOverrides: [String: String]?
 
     /// IDs de experimentos para overrides (paridad con Android)
-    private var experimentOverrideIds: [String: String] = [:]
+    private var _experimentOverrideIds: [String: String]?
+
+    private var experimentOverrides: [String: String] {
+        if let cached = _experimentOverrides {
+            return cached
+        }
+        let (overrides, _) = Self.loadExperimentOverridesStatic()
+        _experimentOverrides = overrides
+        return overrides
+    }
+
+    private var experimentOverrideIds: [String: String] {
+        if let cached = _experimentOverrideIds {
+            return cached
+        }
+        let (_, ids) = Self.loadExperimentOverridesStatic()
+        _experimentOverrideIds = ids
+        return ids
+    }
 
     // MARK: - Init
 
@@ -262,23 +280,8 @@ public actor OfferwallSdk {
         self.registry = registry
         self.dispatcher = ListenerDispatcher()
         self.userDefaults = UserDefaultsSafe.shared
-        // Load experiment overrides directly - we're in actor context
-        let (overrides, overrideIds) = Self.loadExperimentOverridesStatic()
-        self.experimentOverrides = overrides
-        self.experimentOverrideIds = overrideIds
-        // Apply persisted DS environment override immediately so it wins
-        // before any publisher call (fetchConfig runs before DS opens).
-        if let raw = userDefaults.string(forKey: Self.udKeyDebugEnvironment), !raw.isEmpty {
-            switch raw {
-            case "live": self.environment = .live
-            case "test": self.environment = .test
-            default:
-                if raw.hasPrefix("custom:"), let url = URL(string: String(raw.dropFirst("custom:".count))) {
-                    self.environment = .custom(baseURL: url)
-                }
-            }
-            print("[LoomitOW] init: DS environment override applied → \(raw)")
-        }
+        // Load experiment overrides lazily on first access
+        // Load DS environment override lazily on first access
     }
 
     /// Init para tests. **No llamar desde código de producción.**
