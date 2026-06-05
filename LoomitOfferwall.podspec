@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'LoomitOfferwall'
-  s.version          = '0.3.0-beta.5'
+  s.version          = '0.3.0-beta.6'
   s.summary          = 'Loomit Offerwall SDK for iOS'
   s.description      = <<-DESC
     Loomit Offerwall SDK provides a unified monetization layer with multi-provider
@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/guidofarji-sketch/loomit-offerwall-ios.git', :tag => s.version.to_s }
 
   s.ios.deployment_target = '14.0'
-  s.swift_versions = ['5.0']
+  s.swift_versions = ['5.0', '5.9', '6.0']
 
   # Static framework to prevent duplicate symbols when linked in multiple targets
   s.static_framework = true
@@ -31,7 +31,7 @@ Pod::Spec.new do |s|
   ]
 
   s.resource_bundles = {
-    'LoomitOfferwallCore' => ['Resources/EmergencyConfig.json']
+    'LoomitOfferwallCore' => ['Resources/**/*']
   }
 
   s.frameworks = 'Foundation', 'UIKit', 'AdSupport'
@@ -41,6 +41,7 @@ Pod::Spec.new do |s|
   s.dependency 'TapjoySDK', '~> 14.0'
 
   s.pod_target_xcconfig = {
+    'BUILD_LIBRARY_FOR_DISTRIBUTION' => 'YES',
     'SWIFT_VERSION' => '5.0',
     'OTHER_LDFLAGS' => '-ObjC'
   }
