@@ -27,11 +27,6 @@ public final class UserDefaultsSafe {
         self.defaults = defaults
     }
 
-    /// Internal init for tests
-    internal init(defaults: UserDefaults = .standard) {
-        self.defaults = defaults
-    }
-
     // MARK: - String
 
     public func string(forKey key: String) -> String? {
