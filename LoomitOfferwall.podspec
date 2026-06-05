@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'LoomitOfferwall'
-  s.version          = '0.3.0-beta.4'
+  s.version          = '0.3.0-beta.5'
   s.summary          = 'Loomit Offerwall SDK for iOS'
   s.description      = <<-DESC
     Loomit Offerwall SDK provides a unified monetization layer with multi-provider
@@ -15,6 +15,9 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target = '14.0'
   s.swift_versions = ['5.0']
+
+  # Static framework to prevent duplicate symbols when linked in multiple targets
+  s.static_framework = true
 
   # Single monolithic target — all sources compiled once into one library.
   # Subspec architecture causes duplicate symbols with use_frameworks! :linkage => :static
