@@ -40,7 +40,6 @@ import UIKit
 ///     }
 /// }
 /// ```
-@MainActor
 public actor OfferwallSdk {
 
     // MARK: - Singleton
@@ -80,6 +79,10 @@ public actor OfferwallSdk {
     private let identifiers: IdentifierStoring
     private let registry: AdapterRegistry
     private let dispatcher: ListenerDispatcher
+    private let userDefaults: UserDefaultsSafe
+
+    /// Shared UserDefaultsSafe instance for static methods
+    private static let sharedUserDefaults = UserDefaultsSafe()
 
     /// Backend client. Se construye al setear apiKey y se reemplaza si cambia
     /// apiKey o environment.
@@ -261,13 +264,14 @@ public actor OfferwallSdk {
         self.identifiers = identifiers
         self.registry = registry
         self.dispatcher = ListenerDispatcher()
+        self.userDefaults = UserDefaultsSafe()
         // Load experiment overrides directly - we're in actor context
         let (overrides, overrideIds) = Self.loadExperimentOverridesStatic()
         self.experimentOverrides = overrides
         self.experimentOverrideIds = overrideIds
         // Apply persisted DS environment override immediately so it wins
         // before any publisher call (fetchConfig runs before DS opens).
-        if let raw = UserDefaults.standard.string(forKey: Self.udKeyDebugEnvironment), !raw.isEmpty {
+        if let raw = userDefaults.string(forKey: Self.udKeyDebugEnvironment), !raw.isEmpty {
             switch raw {
             case "live": self.environment = .live
             case "test": self.environment = .test
@@ -351,7 +355,7 @@ public actor OfferwallSdk {
     /// Si el debug panel tiene un override persistido y debugging está activo,
     /// las llamadas del publisher son ignoradas (el DS tiene prioridad).
     public func setEnvironment(_ environment: BackendEnvironment) {
-        if let raw = UserDefaults.standard.string(forKey: OfferwallSdk.udKeyDebugEnvironment),
+        if let raw = userDefaults.string(forKey: OfferwallSdk.udKeyDebugEnvironment),
            !raw.isEmpty {
             print("[LoomitOW] setEnvironment(\(environment.baseURL.host ?? "?")) ignored — DS override active (\(raw))")
             return
@@ -643,14 +647,14 @@ public actor OfferwallSdk {
     private func loadCustomPropertyRulesIfNeeded() {
         guard !customPropertyRulesLoaded else { return }
         customPropertyRulesLoaded = true
-        if let rulesData = UserDefaults.standard.data(forKey: OfferwallSdk.udKeyCustomRules),
+        if let rulesData = userDefaults.data(forKey: OfferwallSdk.udKeyCustomRules),
            let rulesDict = try? JSONDecoder().decode([String: [String: String]].self, from: rulesData) {
             customPropertyRules = rulesDict.compactMapValues { dict in
                 guard let mode = dict["mode"], mode == "OVERRIDE" || mode == "DROP" else { return nil }
                 return CustomRule(mode: mode, value: dict["value"])
             }
         }
-        if let extrasData = UserDefaults.standard.data(forKey: OfferwallSdk.udKeyCustomExtras),
+        if let extrasData = userDefaults.data(forKey: OfferwallSdk.udKeyCustomExtras),
            let extrasDict = try? JSONDecoder().decode([String: String].self, from: extrasData) {
             customPropertyExtras = extrasDict
         }
@@ -663,10 +667,10 @@ public actor OfferwallSdk {
             return d
         }
         if let data = try? JSONEncoder().encode(encoded) {
-            UserDefaults.standard.set(data, forKey: OfferwallSdk.udKeyCustomRules)
+            userDefaults.set(data, forKey: OfferwallSdk.udKeyCustomRules)
         }
         if let data = try? JSONEncoder().encode(customPropertyExtras) {
-            UserDefaults.standard.set(data, forKey: OfferwallSdk.udKeyCustomExtras)
+            userDefaults.set(data, forKey: OfferwallSdk.udKeyCustomExtras)
         }
     }
 
@@ -678,13 +682,13 @@ public actor OfferwallSdk {
         case .test:               value = "test"
         case .custom(let url):    value = "custom:\(url.absoluteString)"
         }
-        UserDefaults.standard.set(value, forKey: OfferwallSdk.udKeyDebugEnvironment)
+        userDefaults.set(value, forKey: OfferwallSdk.udKeyDebugEnvironment)
     }
 
     /// Si hay un environment guardado y debuggingEnabled, lo aplica al arrancar el DS.
     /// Paridad con Android `loadAndApplyEnvironmentPreference()`.
     public func loadAndApplyDebugEnvironmentIfNeeded() {
-        guard let raw = UserDefaults.standard.string(forKey: OfferwallSdk.udKeyDebugEnvironment) else { return }
+        guard let raw = userDefaults.string(forKey: OfferwallSdk.udKeyDebugEnvironment) else { return }
         let env: BackendEnvironment
         switch raw {
         case "live": env = .live
@@ -1278,16 +1282,16 @@ public actor OfferwallSdk {
             experimentOverrideIds.removeValue(forKey: experimentName)
         }
         // Persistir en UserDefaults
-        UserDefaults.standard.set(experimentOverrides, forKey: "loomit_experiment_overrides")
-        UserDefaults.standard.set(experimentOverrideIds, forKey: "loomit_experiment_override_ids")
+        userDefaults.set(experimentOverrides, forKey: "loomit_experiment_overrides")
+        userDefaults.set(experimentOverrideIds, forKey: "loomit_experiment_override_ids")
     }
 
     /// Limpia todos los overrides de experimentos (paridad con Android)
     public func clearExperimentOverrides() {
         experimentOverrides.removeAll()
         experimentOverrideIds.removeAll()
-        UserDefaults.standard.removeObject(forKey: "loomit_experiment_overrides")
-        UserDefaults.standard.removeObject(forKey: "loomit_experiment_override_ids")
+        userDefaults.removeObject(forKey: "loomit_experiment_overrides")
+        userDefaults.removeObject(forKey: "loomit_experiment_override_ids")
     }
 
     // MARK: - Internal methods for experiments (paridad con Android)
@@ -1382,10 +1386,10 @@ public actor OfferwallSdk {
         var overrides: [String: String] = [:]
         var overrideIds: [String: String] = [:]
 
-        if let loadedOverrides = UserDefaults.standard.dictionary(forKey: "loomit_experiment_overrides") as? [String: String] {
+        if let loadedOverrides = sharedUserDefaults.dictionary(forKey: "loomit_experiment_overrides") as? [String: String] {
             overrides = loadedOverrides
         }
-        if let loadedIds = UserDefaults.standard.dictionary(forKey: "loomit_experiment_override_ids") as? [String: String] {
+        if let loadedIds = sharedUserDefaults.dictionary(forKey: "loomit_experiment_override_ids") as? [String: String] {
             overrideIds = loadedIds
         }
 
