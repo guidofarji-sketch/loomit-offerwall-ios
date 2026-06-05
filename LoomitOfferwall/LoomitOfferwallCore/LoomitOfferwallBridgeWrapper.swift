@@ -101,9 +101,6 @@ import UIKit
             if let appId = appId, !appId.isEmpty { await self.sdk.setAppId(appId) }
             if let userId = userId, !userId.isEmpty { await self.sdk.setPublisherUserId(userId) }
 
-            await self.sdk.registerAdapter(TapjoyAdapter())
-            await self.sdk.registerAdapter(MyChipsAdapter())
-
             await self.sdk.setListener(self)
 
             self.isSdkInitialized = true
