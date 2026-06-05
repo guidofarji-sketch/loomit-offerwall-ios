@@ -296,6 +296,7 @@ public actor OfferwallSdk {
         self.identifiers = identifiers
         self.registry = registry
         self.dispatcher = ListenerDispatcher()
+        self.userDefaults = UserDefaultsSafe()
         self.injectedBackendClient = backendClient
         self.retryPolicy = retryPolicy
     }
