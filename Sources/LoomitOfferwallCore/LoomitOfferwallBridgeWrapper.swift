@@ -404,20 +404,11 @@ import UIKit
     // MARK: - Public API: Debug
 
     @objc public func setDebuggingEnabled(_ enabled: Bool) {
-        Task {
-            await sdk.setDebuggingEnabled(enabled)
-            if enabled {
-                await MainActor.run {
-                    let collector = DebugDataCollector()
-                    DebugPanel.initialize(dataCollector: collector)
-                    DebugPanel.setEnabled(true)
-                }
-            } else {
-                await MainActor.run {
-                    DebugPanel.setEnabled(false)
-                }
-            }
-        }
+        // NO-OP: DebugPanel initialization triggers IdentifierStore.xifa()
+        // which crashes when accessing UserDefaults from a concurrent queue.
+        // The SDK core still accepts the flag; the wrapper avoids the
+        // DebugPanel path that is not thread-safe in the current SDK version.
+        Task { await sdk.setDebuggingEnabled(enabled) }
     }
 
     @objc public func isDebuggingEnabled() -> Bool {
@@ -432,16 +423,9 @@ import UIKit
     }
 
     @objc public func showDebugPanel() {
-        Task { @MainActor in
-            guard let viewController = self.getTopmostViewController() else {
-                print("[LoomitBridgeWrapper] showDebugPanel: No view controller available")
-                return
-            }
-            if !DebugPanel.isEnabled() {
-                DebugPanel.setEnabled(true)
-            }
-            DebugPanel.show(from: viewController)
-        }
+        // NO-OP: DebugPanel is disabled in the Unity wrapper to avoid
+        // the concurrent UserDefaults crash in IdentifierStore.xifa().
+        print("[LoomitBridgeWrapper] showDebugPanel: disabled in Unity wrapper")
     }
 
     // MARK: - Public API: Environment
