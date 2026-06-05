@@ -16,10 +16,10 @@ Pod::Spec.new do |s|
 
   s.module_name = 'LoomitOfferwallCore'
 
-  s.source_files = 'LoomitOfferwall/Sources/LoomitOfferwallCore/**/*.swift'
+  s.source_files = 'LoomitOfferwall/LoomitOfferwallCore/**/*.swift'
 
   s.resource_bundles = {
-    'LoomitOfferwallCore' => ['LoomitOfferwall/Resources/**/*']
+    'LoomitOfferwallCore' => ['Resources/**/*']
   }
 
   s.frameworks = 'Foundation', 'UIKit', 'AdSupport'
