@@ -419,7 +419,8 @@ import UIKit
     }
 
     @objc public func showDebugPanel() {
-        Task { await self.sdk.showDebugPanel() }
+        // NO-OP: DebugPanel not available in SDK core
+        print("[LoomitBridgeWrapper] showDebugPanel: not implemented in SDK core")
     }
 
     // MARK: - Public API: Environment

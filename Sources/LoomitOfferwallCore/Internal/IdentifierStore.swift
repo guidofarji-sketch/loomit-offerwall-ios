@@ -64,7 +64,7 @@ public final class IdentifierStore: IdentifierStoring, @unchecked Sendable {
     /// Serial queue para todas las operaciones de UserDefaults.
     /// UserDefaults no es thread-safe internamente; usar un serial queue
     /// garantiza que todas las lecturas/escrituras ocurran en secuencia.
-    private let queue = DispatchQueue(label: "com.loomit.offerwall.identifierstore", attributes: .serial)
+    private let queue = DispatchQueue(label: "com.loomit.offerwall.identifierstore")
 
     /// Cache en memoria del fingerprint (no cambia durante lifetime de la app).
     private var cachedFingerprint: String?
