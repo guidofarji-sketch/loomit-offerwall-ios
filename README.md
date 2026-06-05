@@ -1,6 +1,6 @@
 # Loomit Offerwall iOS SDK
 
-[![Version](https://img.shields.io/badge/version-0.3.0--beta.26-blue)](https://github.com/guidofarji-sketch/loomit-offerwall-ios/releases)
+[![Version](https://img.shields.io/badge/version-0.3.0--beta.27-blue)](https://github.com/guidofarji-sketch/loomit-offerwall-ios/releases)
 [![Platform](https://img.shields.io/badge/platform-iOS%2014.0%2B-lightgrey)](https://developer.apple.com/ios/)
 [![Swift](https://img.shields.io/badge/swift-5.0%20%7C%205.9%20%7C%206.0-orange)](https://swift.org)
 [![License](https://img.shields.io/badge/license-Proprietary-red)](LICENSE)
