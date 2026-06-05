@@ -26,31 +26,34 @@ import UIKit
     private var unityGameObject: String = "LoomitOfferwallManager"
     private var isSdkInitialized: Bool = false
 
-    // MARK: - UnitySendMessage
+    // MARK: - Unity Callbacks (NSNotificationCenter decoupling)
+    // The wrapper lives inside the LoomitOfferwall pod and cannot link against
+    // UnityFramework symbols (UnitySendMessage / UnityGetGLViewController).
+    // Callbacks are broadcast as notifications; the ObjC bridge in UnityFramework
+    // observes them and forwards to Unity via UnitySendMessage.
 
-    @_silgen_name("UnitySendMessage")
-    private func UnitySendMessage(_ gameObject: UnsafePointer<CChar>, _ method: UnsafePointer<CChar>, _ message: UnsafePointer<CChar>)
+    private static let unityCallbackNotification = Notification.Name("LoomitUnityCallback")
 
     private func sendToUnity(_ method: String, _ message: String) {
-        let go = unityGameObject
-        go.withCString { gameObjectPtr in
-            method.withCString { methodPtr in
-                message.withCString { messagePtr in
-                    UnitySendMessage(gameObjectPtr, methodPtr, messagePtr)
-                }
-            }
-        }
+        NotificationCenter.default.post(
+            name: Self.unityCallbackNotification,
+            object: nil,
+            userInfo: [
+                "gameObject": unityGameObject,
+                "method": method,
+                "message": message
+            ]
+        )
     }
 
     // MARK: - View Controller Helpers
 
-    @_silgen_name("UnityGetGLViewController")
-    private func UnityGetGLViewController() -> UIViewController?
-
     private func getTopmostViewController() -> UIViewController? {
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let window = windowScene.windows.first(where: { $0.isKeyWindow }) ?? windowScene.windows.first else {
-            return UnityGetGLViewController()
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene else {
+            return nil
+        }
+        guard let window = windowScene.windows.first(where: { $0.isKeyWindow }) ?? windowScene.windows.first else {
+            return nil
         }
 
         var topVC = window.rootViewController
@@ -61,7 +64,7 @@ import UIKit
             topVC = presentedVC
         }
 
-        return topVC ?? UnityGetGLViewController()
+        return topVC
     }
 
     // MARK: - API Key Resolution
