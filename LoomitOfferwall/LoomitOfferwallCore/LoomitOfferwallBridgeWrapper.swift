@@ -181,7 +181,8 @@ import UIKit
         }
     }
 
-    @objc public func showWithProviderAndAdSpace(providerOverride: String?, adSpace: String?) {
+    @objc(showWithProviderAndAdSpace:adSpace:)
+    public func showWithProviderAndAdSpace(providerOverride: String?, adSpace: String?) {
         let provider = providerOverride?.isEmpty == true ? nil : providerOverride
         let space = adSpace?.isEmpty == true ? nil : adSpace
 
@@ -384,7 +385,8 @@ import UIKit
         Task { await self.sdk.setCustomProperty(sanitizedKey, value: finalValue) }
     }
 
-    @objc public func removeCustomProperty(key: String) {
+    @objc(removeCustomProperty:)
+    public func removeCustomProperty(key: String) {
         Task { await self.sdk.removeCustomProperty(key) }
     }
 
@@ -392,7 +394,8 @@ import UIKit
         Task { await self.sdk.clearCustomProperties() }
     }
 
-    @objc public func setCustomPropertiesFromJson(json: String) {
+    @objc(setCustomPropertiesFromJson:)
+    public func setCustomPropertiesFromJson(json: String) {
         guard let data = json.data(using: .utf8),
               let dict = try? JSONSerialization.jsonObject(with: data) as? [String: String] else { return }
         Task { await self.sdk.setCustomProperties(dict) }
