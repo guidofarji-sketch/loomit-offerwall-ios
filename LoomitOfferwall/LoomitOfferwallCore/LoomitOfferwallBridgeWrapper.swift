@@ -103,7 +103,33 @@ import UIKit
 
             await self.sdk.setListener(self)
 
+            // Register adapters dynamically (pods may or may not be present)
+            await self.registerAvailableAdapters()
+
             self.isSdkInitialized = true
+        }
+    }
+
+    /// Dynamically discovers and registers adapters that are linked at runtime.
+    /// Uses NSClassFromString to avoid compile-time dependency on adapter pods.
+    private func registerAvailableAdapters() async {
+        let adapterClasses = [
+            "LoomitOfferwallAdapterTapjoy.TapjoyAdapter",
+            "LoomitOfferwallAdapterMyChips.MyChipsAdapter"
+        ]
+
+        for className in adapterClasses {
+            if let adapterClass = NSClassFromString(className) as? NSObject.Type {
+                let instance = adapterClass.init()
+                if let adapter = instance as? OfferwallAdapter {
+                    await self.sdk.registerAdapter(adapter)
+                    print("[LoomitBridgeWrapper] Registered adapter: \(className)")
+                } else {
+                    print("[LoomitBridgeWrapper] WARNING: \(className) does not conform to OfferwallAdapter")
+                }
+            } else {
+                print("[LoomitBridgeWrapper] Adapter not linked: \(className)")
+            }
         }
     }
 
