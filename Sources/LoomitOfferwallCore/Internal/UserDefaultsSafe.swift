@@ -30,50 +30,81 @@ public final class UserDefaultsSafe {
     // MARK: - String
 
     public func string(forKey key: String) -> String? {
-        DispatchQueue.main.sync { defaults.string(forKey: key) }
+        if Thread.isMainThread {
+            return defaults.string(forKey: key)
+        }
+        return DispatchQueue.main.sync { defaults.string(forKey: key) }
     }
 
     public func set(_ value: String?, forKey key: String) {
-        DispatchQueue.main.async { self.defaults.set(value, forKey: key) }
+        if Thread.isMainThread {
+            defaults.set(value, forKey: key)
+        } else {
+            DispatchQueue.main.async { self.defaults.set(value, forKey: key) }
+        }
     }
 
     // MARK: - Data
 
     public func data(forKey key: String) -> Data? {
-        DispatchQueue.main.sync { defaults.data(forKey: key) }
+        if Thread.isMainThread {
+            return defaults.data(forKey: key)
+        }
+        return DispatchQueue.main.sync { defaults.data(forKey: key) }
     }
 
     public func set(_ value: Data?, forKey key: String) {
-        DispatchQueue.main.async { self.defaults.set(value, forKey: key) }
+        if Thread.isMainThread {
+            defaults.set(value, forKey: key)
+        } else {
+            DispatchQueue.main.async { self.defaults.set(value, forKey: key) }
+        }
     }
 
     // MARK: - Dictionary
 
     public func dictionary(forKey key: String) -> [String: Any]? {
-        DispatchQueue.main.sync { defaults.dictionary(forKey: key) }
+        if Thread.isMainThread {
+            return defaults.dictionary(forKey: key)
+        }
+        return DispatchQueue.main.sync { defaults.dictionary(forKey: key) }
     }
 
     // MARK: - Object
 
     public func object(forKey key: String) -> Any? {
-        DispatchQueue.main.sync { defaults.object(forKey: key) }
+        if Thread.isMainThread {
+            return defaults.object(forKey: key)
+        }
+        return DispatchQueue.main.sync { defaults.object(forKey: key) }
     }
 
     // MARK: - Integer
 
     public func integer(forKey key: String) -> Int {
-        DispatchQueue.main.sync { defaults.integer(forKey: key) }
+        if Thread.isMainThread {
+            return defaults.integer(forKey: key)
+        }
+        return DispatchQueue.main.sync { defaults.integer(forKey: key) }
     }
 
     // MARK: - Remove
 
     public func removeObject(forKey key: String) {
-        DispatchQueue.main.async { self.defaults.removeObject(forKey: key) }
+        if Thread.isMainThread {
+            defaults.removeObject(forKey: key)
+        } else {
+            DispatchQueue.main.async { self.defaults.removeObject(forKey: key) }
+        }
     }
 
     // MARK: - Any (for dictionaries)
 
     public func set(_ value: Any?, forKey key: String) {
-        DispatchQueue.main.async { self.defaults.set(value, forKey: key) }
+        if Thread.isMainThread {
+            defaults.set(value, forKey: key)
+        } else {
+            DispatchQueue.main.async { self.defaults.set(value, forKey: key) }
+        }
     }
 }
