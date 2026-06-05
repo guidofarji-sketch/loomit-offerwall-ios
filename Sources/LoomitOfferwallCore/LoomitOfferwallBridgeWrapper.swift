@@ -80,41 +80,43 @@ import UIKit
 
         print("[LoomitBridgeWrapper] initialize(gameObject=\(gameObject), clientId=\(clientId))")
 
-        Task { @MainActor in
-            // Guard: Skip duplicate initialization
-            if self.isSdkInitialized {
-                print("[LoomitBridgeWrapper] SDK already initialized (guard preventing duplicate init)")
+        DispatchQueue.main.async {
+            Task {
+                // Guard: Skip duplicate initialization
+                if self.isSdkInitialized {
+                    print("[LoomitBridgeWrapper] SDK already initialized (guard preventing duplicate init)")
+                    await self.sdk.setListener(self)
+                    return
+                }
+
+                if let apiKey = self.resolveApiKey(), !apiKey.isEmpty {
+                    await self.sdk.setLoomitApiKey(apiKey)
+                } else {
+                    print("[LoomitBridgeWrapper] WARNING: No LoomitApiKey found in Info.plist")
+                }
+
+                if !clientId.isEmpty { await self.sdk.setClientId(clientId) }
+                if let appId = appId, !appId.isEmpty { await self.sdk.setAppId(appId) }
+                if let userId = userId, !userId.isEmpty { await self.sdk.setPublisherUserId(userId) }
+
+                await self.sdk.registerAdapter(TapjoyAdapter())
+                await self.sdk.registerAdapter(MyChipsAdapter())
+
                 await self.sdk.setListener(self)
-                return
+
+                self.isSdkInitialized = true
             }
-
-            if let apiKey = self.resolveApiKey(), !apiKey.isEmpty {
-                await self.sdk.setLoomitApiKey(apiKey)
-            } else {
-                print("[LoomitBridgeWrapper] WARNING: No LoomitApiKey found in Info.plist")
-            }
-
-            if !clientId.isEmpty { await self.sdk.setClientId(clientId) }
-            if let appId = appId, !appId.isEmpty { await self.sdk.setAppId(appId) }
-            if let userId = userId, !userId.isEmpty { await self.sdk.setPublisherUserId(userId) }
-
-            await self.sdk.registerAdapter(TapjoyAdapter())
-            await self.sdk.registerAdapter(MyChipsAdapter())
-
-            await self.sdk.setListener(self)
-
-            self.isSdkInitialized = true
         }
     }
 
     // MARK: - Public API: User Management
 
     @objc public func setUserId(_ userId: String?) {
-        Task { @MainActor in await sdk.setPublisherUserId(userId) }
+        DispatchQueue.main.async { Task { await sdk.setPublisherUserId(userId) } }
     }
 
     @objc public func clearUserId() {
-        Task { @MainActor in await sdk.clearPublisherUserId() }
+        DispatchQueue.main.async { Task { await sdk.clearPublisherUserId() } }
     }
 
     @objc public func getUserId() -> String? {
@@ -146,13 +148,15 @@ import UIKit
     // MARK: - Public API: Show/Close
 
     @objc public func show() {
-        Task { @MainActor in
-            guard let vc = self.getTopmostViewController() else {
-                print("[LoomitBridgeWrapper] ERROR: No ViewController available for show()")
-                self.sendToUnity("OnOfferwallShowFailed", "No ViewController")
-                return
+        DispatchQueue.main.async {
+            Task {
+                guard let vc = self.getTopmostViewController() else {
+                    print("[LoomitBridgeWrapper] ERROR: No ViewController available for show()")
+                    self.sendToUnity("OnOfferwallShowFailed", "No ViewController")
+                    return
+                }
+                await self.sdk.show(from: vc)
             }
-            await self.sdk.show(from: vc)
         }
     }
 
@@ -162,26 +166,30 @@ import UIKit
 
         print("[LoomitBridgeWrapper] showWithProviderAndAdSpace: USER REQUEST")
 
-        Task { @MainActor in
-            guard let vc = self.getTopmostViewController() else {
-                self.sendToUnity("OnOfferwallShowFailed", "No ViewController")
-                return
+        DispatchQueue.main.async {
+            Task {
+                guard let vc = self.getTopmostViewController() else {
+                    self.sendToUnity("OnOfferwallShowFailed", "No ViewController")
+                    return
+                }
+                await self.sdk.show(from: vc, providerOverride: provider, adSpace: space)
             }
-            await self.sdk.show(from: vc, providerOverride: provider, adSpace: space)
         }
     }
 
     @objc public func close() {
-        Task { @MainActor in await sdk.close() }
+        DispatchQueue.main.async { Task { await sdk.close() } }
     }
 
     @objc public func failoverToNext() {
-        Task { @MainActor in
-            guard let vc = self.getTopmostViewController() else {
-                self.sendToUnity("OnOfferwallShowFailed", "Failover failed: No ViewController")
-                return
+        DispatchQueue.main.async {
+            Task {
+                guard let vc = self.getTopmostViewController() else {
+                    self.sendToUnity("OnOfferwallShowFailed", "Failover failed: No ViewController")
+                    return
+                }
+                _ = await self.sdk.failoverToNext(from: vc, adSpace: nil)
             }
-            _ = await self.sdk.failoverToNext(from: vc, adSpace: nil)
         }
     }
 
@@ -225,22 +233,26 @@ import UIKit
 
     @objc public func fetchConfig() {
         print("[LoomitBridgeWrapper] fetchConfig: USER REQUEST")
-        Task { @MainActor in
-            do {
-                _ = try await sdk.fetchConfig()
-                print("[LoomitBridgeWrapper] fetchConfig: SUCCESS")
-            } catch {
-                print("[LoomitBridgeWrapper] fetchConfig: FAILED - \(error.localizedDescription)")
-                self.sendToUnity("OnConfigFetchFailed", "fetchConfig failed: \(error.localizedDescription)")
+        DispatchQueue.main.async {
+            Task {
+                do {
+                    _ = try await sdk.fetchConfig()
+                    print("[LoomitBridgeWrapper] fetchConfig: SUCCESS")
+                } catch {
+                    print("[LoomitBridgeWrapper] fetchConfig: FAILED - \(error.localizedDescription)")
+                    self.sendToUnity("OnConfigFetchFailed", "fetchConfig failed: \(error.localizedDescription)")
+                }
             }
         }
     }
 
     @objc public func initializeProviders() {
         print("[LoomitBridgeWrapper] initializeProviders: USER REQUEST")
-        Task { @MainActor in
-            await sdk.initAllFromPlan()
-            print("[LoomitBridgeWrapper] initializeProviders: COMPLETED")
+        DispatchQueue.main.async {
+            Task {
+                await sdk.initAllFromPlan()
+                print("[LoomitBridgeWrapper] initializeProviders: COMPLETED")
+            }
         }
     }
 
@@ -356,21 +368,21 @@ import UIKit
         guard !sanitizedKey.isEmpty else { return }
         let sanitizedValue = value?.trimmingCharacters(in: .whitespacesAndNewlines)
         let finalValue = sanitizedValue?.isEmpty == true ? nil : sanitizedValue
-        Task { @MainActor in await sdk.setCustomProperty(sanitizedKey, value: finalValue) }
+        DispatchQueue.main.async { Task { await sdk.setCustomProperty(sanitizedKey, value: finalValue) } }
     }
 
     @objc public func removeCustomProperty(key: String) {
-        Task { @MainActor in await sdk.removeCustomProperty(key) }
+        DispatchQueue.main.async { Task { await sdk.removeCustomProperty(key) } }
     }
 
     @objc public func clearCustomProperties() {
-        Task { @MainActor in await sdk.clearCustomProperties() }
+        DispatchQueue.main.async { Task { await sdk.clearCustomProperties() } }
     }
 
     @objc public func setCustomPropertiesFromJson(json: String) {
         guard let data = json.data(using: .utf8),
               let dict = try? JSONSerialization.jsonObject(with: data) as? [String: String] else { return }
-        Task { @MainActor in await sdk.setCustomProperties(dict) }
+        DispatchQueue.main.async { Task { await sdk.setCustomProperties(dict) } }
     }
 
     // MARK: - Public API: Privacy
@@ -379,14 +391,16 @@ import UIKit
                                           tcfConsentString: String?, usPrivacyString: String?) {
         let tcf = tcfConsentString?.isEmpty == true ? nil : tcfConsentString
         let usPrivacy = usPrivacyString?.isEmpty == true ? nil : usPrivacyString
-        Task { @MainActor in
-            await sdk.setPrivacy(
-                tcfConsentString: tcf,
-                usPrivacyString: usPrivacy,
-                subjectToGdpr: subjectToGdpr,
-                gdprConsent: gdprConsent,
-                ccpaOptOut: ccpaOptOut
-            )
+        DispatchQueue.main.async {
+            Task {
+                await sdk.setPrivacy(
+                    tcfConsentString: tcf,
+                    usPrivacyString: usPrivacy,
+                    subjectToGdpr: subjectToGdpr,
+                    gdprConsent: gdprConsent,
+                    ccpaOptOut: ccpaOptOut
+                )
+            }
         }
     }
 
@@ -394,11 +408,11 @@ import UIKit
 
     @objc public func setAdvertisingId(_ advertisingId: String?) {
         let adId = advertisingId?.isEmpty == true ? nil : advertisingId
-        Task { @MainActor in await sdk.setAdvertisingId(adId) }
+        DispatchQueue.main.async { Task { await sdk.setAdvertisingId(adId) } }
     }
 
     @objc public func setHasAdvertisingId(_ has: Bool) {
-        Task { @MainActor in await sdk.setHasAdvertisingId(has) }
+        DispatchQueue.main.async { Task { await sdk.setHasAdvertisingId(has) } }
     }
 
     // MARK: - Public API: Debug
@@ -408,7 +422,7 @@ import UIKit
         // which crashes when accessing UserDefaults from a concurrent queue.
         // The SDK core still accepts the flag; the wrapper avoids the
         // DebugPanel path that is not thread-safe in the current SDK version.
-        Task { @MainActor in await sdk.setDebuggingEnabled(enabled) }
+        DispatchQueue.main.async { Task { await sdk.setDebuggingEnabled(enabled) } }
     }
 
     @objc public func isDebuggingEnabled() -> Bool {
@@ -432,22 +446,24 @@ import UIKit
 
     @objc public func setEnvironment(_ envString: String) {
         print("[LoomitBridgeWrapper] setEnvironment(\(envString))")
-        Task { @MainActor in
-            let environment: BackendEnvironment
-            switch envString.lowercased() {
-            case "live", "production":
-                environment = .live
-            case "test", "staging":
-                environment = .test
-            default:
-                if let url = URL(string: envString) {
-                    environment = .custom(baseURL: url)
-                } else {
-                    print("[LoomitBridgeWrapper] WARNING: Invalid environment '\(envString)', defaulting to live")
+        DispatchQueue.main.async {
+            Task {
+                let environment: BackendEnvironment
+                switch envString.lowercased() {
+                case "live", "production":
                     environment = .live
+                case "test", "staging":
+                    environment = .test
+                default:
+                    if let url = URL(string: envString) {
+                        environment = .custom(baseURL: url)
+                    } else {
+                        print("[LoomitBridgeWrapper] WARNING: Invalid environment '\(envString)', defaulting to live")
+                        environment = .live
+                    }
                 }
+                await sdk.setEnvironment(environment)
             }
-            await sdk.setEnvironment(environment)
         }
     }
 
