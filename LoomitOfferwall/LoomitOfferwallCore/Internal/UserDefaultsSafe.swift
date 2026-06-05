@@ -23,7 +23,7 @@ public final class UserDefaultsSafe {
     /// Use this to prevent crashes from concurrent access across multiple instances.
     public static let shared = UserDefaultsSafe()
 
-    private init(defaults: UserDefaults = .standard) {
+    public init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
     }
 
