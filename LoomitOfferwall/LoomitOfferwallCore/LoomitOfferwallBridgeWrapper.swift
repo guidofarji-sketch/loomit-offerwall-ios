@@ -144,13 +144,12 @@ import UIKit
     }
 
     @objc public func getUserId() -> String? {
-        // Note: This is async internally but we can't await in @objc.
-        // For now return nil; the .m bridge uses syncAwait pattern if needed.
-        // The wrapper is called from .m which runs on main thread.
-        // We'll use a synchronous wait for simple getters.
         let semaphore = DispatchSemaphore(value: 0)
         var result: String?
-        Task {
+        // Use Task.detached to avoid deadlock when called from main thread.
+        // The bridged .m runs on Unity's main thread; Task{} inherits the
+        // actor context and could starve. Task.detached runs on a pool thread.
+        Task.detached {
             result = await self.sdk.getPublisherUserId()
             semaphore.signal()
         }
@@ -161,7 +160,7 @@ import UIKit
     @objc public func getXifa() -> String {
         let semaphore = DispatchSemaphore(value: 0)
         var result: String = ""
-        Task {
+        Task.detached {
             result = await self.sdk.xifa()
             semaphore.signal()
         }
