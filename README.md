@@ -29,7 +29,7 @@ Add to your `Podfile`:
 platform :ios, '14.0'
 use_frameworks! :linkage => :static
 
-pod 'LoomitOfferwall', :git => 'https://github.com/guidofarji-sketch/loomit-offerwall-ios.git', :tag => '0.3.0-beta.6'
+pod 'LoomitOfferwall', :git => 'https://github.com/guidofarji-sketch/loomit-offerwall-ios.git', :tag => '0.3.0-beta.7'
 ```
 
 Then run:

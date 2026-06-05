@@ -15,7 +15,6 @@ import Foundation
 #if canImport(UIKit)
 import UIKit
 #endif
-import LoomitOfferwallAdapterAPI
 
 /// @objc wrapper that bridges Unity ↔ OfferwallSdk actor.
 /// Lives INSIDE the SDK pod so it links against the SDK at build time.
