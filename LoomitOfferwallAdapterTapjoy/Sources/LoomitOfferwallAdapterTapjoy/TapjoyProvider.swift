@@ -215,6 +215,16 @@ public final class TapjoyProvider: NSObject, OfferwallProvider, @preconcurrency 
     }
 
     public func close() {
+        guard !hasReportedClose else {
+            print("[TapjoyProvider] ⚠️ close() ignored: already reported close")
+            return
+        }
+        hasReportedClose = true
+
+        // Clean up NotificationCenter observers
+        NotificationCenter.default.removeObserver(self)
+        hasRegisteredObservers = false
+
         state = .notInitialized
         contentAvailable = false
         providerListener?.providerDidClose(providerKey)
