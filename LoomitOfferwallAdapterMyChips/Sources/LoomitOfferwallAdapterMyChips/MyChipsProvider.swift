@@ -161,6 +161,11 @@ public final class MyChipsProvider: OfferwallProvider {
         self.presentedVC = webVC
         self.presentedModally = true
 
+        // Notify Core that the offerwall is now visible.
+        // MAF has no native delegate for this; we report it directly since
+        // the VC is already on screen after present() returns.
+        providerListener?.providerDidShow(providerKey)
+
         return .success(())
     }
 

@@ -191,6 +191,11 @@ public actor OfferwallSdk {
     private var hasProviderReportedShow = false
     private var hasProviderReportedClose = false
 
+    /// Guard contra snapshots duplicados: trackea el hash del último estado emitido
+    /// para este lifecycle. Si el estado no cambió, no se emite snapshot nuevo.
+    private var lastSnapshotLifecycleId: Int = 0
+    private var lastSnapshotAvailabilityHash: Int = 0
+
     // MARK: - Availability Barrier Constants (paridad con Android)
 
     /// Debounce delay antes de emitir availability snapshot.
@@ -2028,7 +2033,10 @@ public actor OfferwallSdk {
                 
                 switch showResult {
                 case .success:
-                    await handleProviderDidShow(providerKey: providerKey)
+                    // content_show is emitted by the provider via providerDidShow callback,
+                    // NOT here. This prevents duplicate events when providers like Tapjoy
+                    // also fire a delegate callback after showing.
+                    break
                 case .failure(let error):
                     await handleShowFailed(
                         providerKey: providerKey,
@@ -2103,8 +2111,9 @@ public actor OfferwallSdk {
 
         switch showResult {
         case .success:
-            // Provider started showing — emit content_show immediately
-            await handleProviderDidShow(providerKey: providerKey)
+            // Provider started showing. content_show is emitted exclusively by the
+            // provider's providerDidShow callback to avoid duplicates.
+            break
 
         case .failure(let error):
             // Provider failed to show
@@ -2560,6 +2569,10 @@ public actor OfferwallSdk {
         lifecycleStartCount += 1
         currentLifecycleId = allocateNextLifecycleId()
         lifecycleIdFromAvailability = true
+
+        // Reset snapshot tracking for new lifecycle
+        lastSnapshotLifecycleId = 0
+        lastSnapshotAvailabilityHash = 0
         
         // Capture caller stack for diagnostics
         let callerStack = LifecycleDiagnosticLogger.captureCallerStack(skipFrames: 2, maxFrames: 3)
@@ -2592,6 +2605,23 @@ public actor OfferwallSdk {
     }
 
     private func emitProvidersAvailabilitySnapshot() async {
+        // Compute availability hash: combination of hasContent + initialized bits
+        let availabilityHash = providerPlan.indices.reduce(into: 0) { hash, index in
+            let hasContent = providerHasContent.indices.contains(index) ? providerHasContent[index] : false
+            let isInit = providerInitialized.indices.contains(index) ? providerInitialized[index] : false
+            let bit = (hasContent ? 1 : 0) | (isInit ? 2 : 0)
+            hash = hash * 4 + bit
+        }
+
+        // Skip if same lifecycle and same availability state already emitted
+        if currentLifecycleId == lastSnapshotLifecycleId && availabilityHash == lastSnapshotAvailabilityHash {
+            print("[OfferwallSDK] ⚠️ Duplicate providers_availability_snapshot skipped (same state for LC=\(currentLifecycleId))")
+            return
+        }
+
+        lastSnapshotLifecycleId = currentLifecycleId
+        lastSnapshotAvailabilityHash = availabilityHash
+
         var providersStatus: [JSONValue] = []
         var availableCount = 0
 
