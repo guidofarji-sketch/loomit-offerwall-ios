@@ -19,6 +19,7 @@
 //
 
 import Foundation
+import LoomitOfferwallAdapterAPI
 #if canImport(UIKit)
 import UIKit
 #endif

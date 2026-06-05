@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import LoomitOfferwallAdapterAPI
 
 /// Política para fetch de configuración.
 public struct ConfigFetchPolicy: Sendable, Equatable {

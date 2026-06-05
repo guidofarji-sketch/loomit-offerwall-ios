@@ -16,6 +16,7 @@
 //
 
 import Foundation
+import LoomitOfferwallAdapterAPI
 
 /// Despachador centralizado de UX callbacks al `OfferwallListener` global.
 ///

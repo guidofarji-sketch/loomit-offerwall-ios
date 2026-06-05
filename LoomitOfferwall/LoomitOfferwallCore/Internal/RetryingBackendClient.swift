@@ -15,6 +15,7 @@
 //
 
 import Foundation
+import LoomitOfferwallAdapterAPI
 
 /// Wrapper que añade retry con exponential backoff a un `BackendClient`.
 public final class RetryingBackendClient: BackendClient {

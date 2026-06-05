@@ -12,6 +12,7 @@
 //
 
 import Foundation
+import LoomitOfferwallAdapterAPI
 
 public actor ResilientEventPusher: OfferwallEventPusher {
 

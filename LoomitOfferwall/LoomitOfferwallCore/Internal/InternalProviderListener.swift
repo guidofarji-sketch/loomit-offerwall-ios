@@ -11,6 +11,7 @@
 //
 
 import Foundation
+import LoomitOfferwallAdapterAPI
 
 /// Listener interno que core registra en cada provider.
 ///

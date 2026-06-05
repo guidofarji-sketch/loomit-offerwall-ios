@@ -14,6 +14,7 @@
 //
 
 import Foundation
+import LoomitOfferwallAdapterAPI
 
 /// Registro thread-safe de adapters. Implementado como `actor` para acceso
 /// concurrente seguro desde cualquier contexto.

@@ -16,6 +16,7 @@
 //
 
 import Foundation
+import LoomitOfferwallAdapterAPI
 
 /// Listener UX que el publisher registra via `OfferwallSdk.setListener(...)`.
 ///
