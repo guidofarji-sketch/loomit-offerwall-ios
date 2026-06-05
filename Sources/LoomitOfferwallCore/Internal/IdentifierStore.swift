@@ -57,7 +57,7 @@ public final class IdentifierStore: IdentifierStoring, @unchecked Sendable {
 
     // MARK: Dependencies
 
-    private let defaults: UserDefaults
+    private let defaults: UserDefaultsSafe
     private let bundle: Bundle
     private let idfvProvider: () -> String?
 
@@ -68,7 +68,7 @@ public final class IdentifierStore: IdentifierStoring, @unchecked Sendable {
     private var cachedFingerprint: String?
 
     public init(
-        defaults: UserDefaults = .standard,
+        defaults: UserDefaultsSafe = UserDefaultsSafe(),
         bundle: Bundle = .main,
         idfvProvider: @escaping () -> String? = { UIDevice.current.identifierForVendor?.uuidString }
     ) {

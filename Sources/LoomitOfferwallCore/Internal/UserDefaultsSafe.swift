@@ -46,6 +46,18 @@ public final class UserDefaultsSafe {
         queue.sync { defaults.dictionary(forKey: key) }
     }
 
+    // MARK: - Object
+
+    public func object(forKey key: String) -> Any? {
+        queue.sync { defaults.object(forKey: key) }
+    }
+
+    // MARK: - Integer
+
+    public func integer(forKey key: String) -> Int {
+        queue.sync { defaults.integer(forKey: key) }
+    }
+
     // MARK: - Remove
 
     public func removeObject(forKey key: String) {

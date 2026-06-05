@@ -42,15 +42,15 @@ public enum PrivacyResolver {
     private static let keyUsPrivacy = "IABUSPrivacy_String"
     
     /// Resolve privacy state from device storage.
-    /// 
+    ///
     /// Many CMPs write to the app's root UserDefaults. We use the standard UserDefaults
     /// which is equivalent to Android's MODE_PRIVATE SharedPreferences.
     public static func resolve() -> PrivacyState {
-        let defaults = UserDefaults.standard
-        
+        let defaults = UserDefaultsSafe()
+
         let tcf = defaults.string(forKey: keyTcfString)
         let us = defaults.string(forKey: keyUsPrivacy)
-        
+
         let subjectToGdpr: Bool?
         if defaults.object(forKey: keyTcfGdprApplies) != nil {
             let gdprAppliesInt = defaults.integer(forKey: keyTcfGdprApplies)
@@ -62,7 +62,7 @@ public enum PrivacyResolver {
         } else {
             subjectToGdpr = nil
         }
-        
+
         // Inferir ccpaOptOut de IAB US-Privacy string (posición 2: 'Y'=optOut, 'N'=no optOut).
         // Spec: https://github.com/InteractiveAdvertisingBureau/USPrivacy/blob/master/CCPA/US%20Privacy%20String.md
         let ccpaOptOut: Bool?
