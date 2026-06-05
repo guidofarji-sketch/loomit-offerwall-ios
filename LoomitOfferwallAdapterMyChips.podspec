@@ -21,4 +21,5 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = 'Frameworks/MyChipsSdk.xcframework'
 
   s.static_framework = true
+  s.module_name = 'LoomitOfferwallAdapterMyChips'
 end

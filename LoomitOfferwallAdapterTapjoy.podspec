@@ -20,4 +20,5 @@ Pod::Spec.new do |s|
   s.dependency 'TapjoySDK', '~> 14.7.0'
 
   s.static_framework = true
+  s.module_name = 'LoomitOfferwallAdapterTapjoy'
 end

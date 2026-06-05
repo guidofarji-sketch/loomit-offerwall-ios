@@ -15,6 +15,7 @@ Pod::Spec.new do |s|
   s.swift_versions = ['5.0', '5.9', '6.0']
 
   s.static_framework = true
+  s.module_name = 'LoomitOfferwallCore'
 
   s.source_files = 'LoomitOfferwall/Sources/LoomitOfferwallCore/**/*.swift'
 
