@@ -4,69 +4,81 @@
 //
 //  Thread-safe wrapper for UserDefaults.
 //  UserDefaults internally uses CFPrefsSearchListSource which is not thread-safe.
-//  This wrapper uses a serial DispatchQueue to guarantee all operations happen sequentially.
+//  Even with a serial queue, concurrent access from different threads can crash.
+//  The ONLY reliable solution is to use the main thread for all UserDefaults access.
+//
+// IMPORTANT: Use the shared instance to ensure all UserDefaults operations across the SDK
+// use the main thread. Multiple instances with separate queues can still cause crashes.
 //
 
 import Foundation
 
 /// Thread-safe wrapper for UserDefaults.
-/// All read/write operations are serialized on a dedicated queue.
+/// All read/write operations are forced to run on the main thread.
 public final class UserDefaultsSafe {
 
     private let defaults: UserDefaults
-    private let queue = DispatchQueue(label: "com.loomit.offerwall.userdefaults", qos: .userInitiated)
 
-    public init(defaults: UserDefaults = .standard) {
+    /// Shared instance that forces all operations to the main thread.
+    /// Use this to prevent crashes from concurrent access across multiple instances.
+    public static let shared = UserDefaultsSafe()
+
+    private init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+    }
+
+    /// Internal init for tests
+    internal init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
     }
 
     // MARK: - String
 
     public func string(forKey key: String) -> String? {
-        queue.sync { defaults.string(forKey: key) }
+        DispatchQueue.main.sync { defaults.string(forKey: key) }
     }
 
     public func set(_ value: String?, forKey key: String) {
-        queue.sync { defaults.set(value, forKey: key) }
+        DispatchQueue.main.async { self.defaults.set(value, forKey: key) }
     }
 
     // MARK: - Data
 
     public func data(forKey key: String) -> Data? {
-        queue.sync { defaults.data(forKey: key) }
+        DispatchQueue.main.sync { defaults.data(forKey: key) }
     }
 
     public func set(_ value: Data?, forKey key: String) {
-        queue.sync { defaults.set(value, forKey: key) }
+        DispatchQueue.main.async { self.defaults.set(value, forKey: key) }
     }
 
     // MARK: - Dictionary
 
     public func dictionary(forKey key: String) -> [String: Any]? {
-        queue.sync { defaults.dictionary(forKey: key) }
+        DispatchQueue.main.sync { defaults.dictionary(forKey: key) }
     }
 
     // MARK: - Object
 
     public func object(forKey key: String) -> Any? {
-        queue.sync { defaults.object(forKey: key) }
+        DispatchQueue.main.sync { defaults.object(forKey: key) }
     }
 
     // MARK: - Integer
 
     public func integer(forKey key: String) -> Int {
-        queue.sync { defaults.integer(forKey: key) }
+        DispatchQueue.main.sync { defaults.integer(forKey: key) }
     }
 
     // MARK: - Remove
 
     public func removeObject(forKey key: String) {
-        queue.sync { defaults.removeObject(forKey: key) }
+        DispatchQueue.main.async { self.defaults.removeObject(forKey: key) }
     }
 
     // MARK: - Any (for dictionaries)
 
     public func set(_ value: Any?, forKey key: String) {
-        queue.sync { defaults.set(value, forKey: key) }
+        DispatchQueue.main.async { self.defaults.set(value, forKey: key) }
     }
 }

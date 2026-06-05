@@ -68,7 +68,7 @@ public final class IdentifierStore: IdentifierStoring, @unchecked Sendable {
     private var cachedFingerprint: String?
 
     public init(
-        defaults: UserDefaultsSafe = UserDefaultsSafe(),
+        defaults: UserDefaultsSafe = UserDefaultsSafe.shared,
         bundle: Bundle = .main,
         idfvProvider: @escaping () -> String? = { UIDevice.current.identifierForVendor?.uuidString }
     ) {

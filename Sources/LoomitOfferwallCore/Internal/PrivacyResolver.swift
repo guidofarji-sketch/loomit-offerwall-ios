@@ -46,7 +46,7 @@ public enum PrivacyResolver {
     /// Many CMPs write to the app's root UserDefaults. We use the standard UserDefaults
     /// which is equivalent to Android's MODE_PRIVATE SharedPreferences.
     public static func resolve() -> PrivacyState {
-        let defaults = UserDefaultsSafe()
+        let defaults = UserDefaultsSafe.shared
 
         let tcf = defaults.string(forKey: keyTcfString)
         let us = defaults.string(forKey: keyUsPrivacy)

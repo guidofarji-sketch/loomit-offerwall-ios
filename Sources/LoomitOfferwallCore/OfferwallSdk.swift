@@ -81,9 +81,6 @@ public actor OfferwallSdk {
     private let dispatcher: ListenerDispatcher
     private let userDefaults: UserDefaultsSafe
 
-    /// Shared UserDefaultsSafe instance for static methods
-    private static let sharedUserDefaults = UserDefaultsSafe()
-
     /// Backend client. Se construye al setear apiKey y se reemplaza si cambia
     /// apiKey o environment.
     private var backendClient: BackendClient?
@@ -264,7 +261,7 @@ public actor OfferwallSdk {
         self.identifiers = identifiers
         self.registry = registry
         self.dispatcher = ListenerDispatcher()
-        self.userDefaults = UserDefaultsSafe()
+        self.userDefaults = UserDefaultsSafe.shared
         // Load experiment overrides directly - we're in actor context
         let (overrides, overrideIds) = Self.loadExperimentOverridesStatic()
         self.experimentOverrides = overrides
@@ -296,7 +293,7 @@ public actor OfferwallSdk {
         self.identifiers = identifiers
         self.registry = registry
         self.dispatcher = ListenerDispatcher()
-        self.userDefaults = UserDefaultsSafe()
+        self.userDefaults = UserDefaultsSafe.shared
         self.injectedBackendClient = backendClient
         self.retryPolicy = retryPolicy
     }
@@ -1387,10 +1384,10 @@ public actor OfferwallSdk {
         var overrides: [String: String] = [:]
         var overrideIds: [String: String] = [:]
 
-        if let loadedOverrides = sharedUserDefaults.dictionary(forKey: "loomit_experiment_overrides") as? [String: String] {
+        if let loadedOverrides = UserDefaultsSafe.shared.dictionary(forKey: "loomit_experiment_overrides") as? [String: String] {
             overrides = loadedOverrides
         }
-        if let loadedIds = sharedUserDefaults.dictionary(forKey: "loomit_experiment_override_ids") as? [String: String] {
+        if let loadedIds = UserDefaultsSafe.shared.dictionary(forKey: "loomit_experiment_override_ids") as? [String: String] {
             overrideIds = loadedIds
         }
 
