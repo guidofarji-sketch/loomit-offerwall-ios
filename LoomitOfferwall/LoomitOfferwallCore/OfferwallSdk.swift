@@ -2488,9 +2488,14 @@ public actor OfferwallSdk {
             return
         }
         
-        // Start new lifecycle + snapshot
+        // Start new lifecycle
         await startNewLifecycle()
-        await emitProvidersAvailabilitySnapshot()
+        
+        // Re-arm barrier and schedule snapshot with debounce.
+        // This gives providers like Tapjoy time to complete auto-refill
+        // before emitting the snapshot, avoiding an intermediate state.
+        availabilityBarrierDeadline = Date().timeIntervalSince1970 + Self.CYCLE_MAX_WAIT_MS
+        scheduleAvailabilitySnapshot(reason: "lifecycle_restart")
     }
 
     // MARK: - Private: Provider init helpers
