@@ -112,11 +112,11 @@ import UIKit
     // MARK: - Public API: User Management
 
     @objc public func setUserId(_ userId: String?) {
-        DispatchQueue.main.async { Task { await sdk.setPublisherUserId(userId) } }
+        DispatchQueue.main.async { Task { await self.sdk.setPublisherUserId(userId) } }
     }
 
     @objc public func clearUserId() {
-        DispatchQueue.main.async { Task { await sdk.clearPublisherUserId() } }
+        DispatchQueue.main.async { Task { await self.sdk.clearPublisherUserId() } }
     }
 
     @objc public func getUserId() -> String? {
@@ -127,7 +127,7 @@ import UIKit
         let semaphore = DispatchSemaphore(value: 0)
         var result: String?
         Task {
-            result = await sdk.getPublisherUserId()
+            result = await self.sdk.getPublisherUserId()
             semaphore.signal()
         }
         semaphore.wait()
@@ -138,7 +138,7 @@ import UIKit
         let semaphore = DispatchSemaphore(value: 0)
         var result: String = ""
         Task {
-            result = await sdk.xifa()
+            result = await self.sdk.xifa()
             semaphore.signal()
         }
         semaphore.wait()
@@ -178,7 +178,7 @@ import UIKit
     }
 
     @objc public func close() {
-        DispatchQueue.main.async { Task { await sdk.close() } }
+        DispatchQueue.main.async { Task { await self.sdk.close() } }
     }
 
     @objc public func failoverToNext() {
@@ -199,7 +199,7 @@ import UIKit
         let semaphore = DispatchSemaphore(value: 0)
         var result = false
         Task {
-            result = await sdk.hasAvailableOfferwall()
+            result = await self.sdk.hasAvailableOfferwall()
             semaphore.signal()
         }
         semaphore.wait()
@@ -210,7 +210,7 @@ import UIKit
         let semaphore = DispatchSemaphore(value: 0)
         var result: String?
         Task {
-            result = await sdk.getActiveProviderName()
+            result = await self.sdk.getActiveProviderName()
             semaphore.signal()
         }
         semaphore.wait()
@@ -221,7 +221,7 @@ import UIKit
         let semaphore = DispatchSemaphore(value: 0)
         var result: [String] = []
         Task {
-            result = await sdk.getAvailableProviders()
+            result = await self.sdk.getAvailableProviders()
             semaphore.signal()
         }
         semaphore.wait()
@@ -236,7 +236,7 @@ import UIKit
         DispatchQueue.main.async {
             Task {
                 do {
-                    _ = try await sdk.fetchConfig()
+                    _ = try await self.sdk.fetchConfig()
                     print("[LoomitBridgeWrapper] fetchConfig: SUCCESS")
                 } catch {
                     print("[LoomitBridgeWrapper] fetchConfig: FAILED - \(error.localizedDescription)")
@@ -250,7 +250,7 @@ import UIKit
         print("[LoomitBridgeWrapper] initializeProviders: USER REQUEST")
         DispatchQueue.main.async {
             Task {
-                await sdk.initAllFromPlan()
+                await self.sdk.initAllFromPlan()
                 print("[LoomitBridgeWrapper] initializeProviders: COMPLETED")
             }
         }
@@ -260,7 +260,7 @@ import UIKit
         let semaphore = DispatchSemaphore(value: 0)
         var result: String?
         Task {
-            result = await sdk.getLastSegmentName()
+            result = await self.sdk.getLastSegmentName()
             semaphore.signal()
         }
         semaphore.wait()
@@ -271,7 +271,7 @@ import UIKit
         let semaphore = DispatchSemaphore(value: 0)
         var result = false
         Task {
-            result = await sdk.hasActiveExperiments()
+            result = await self.sdk.hasActiveExperiments()
             semaphore.signal()
         }
         semaphore.wait()
@@ -282,7 +282,7 @@ import UIKit
         let semaphore = DispatchSemaphore(value: 0)
         var result: [OfferwallSdk.ExperimentAssignment] = []
         Task {
-            result = await sdk.getLastExperimentAssignments()
+            result = await self.sdk.getLastExperimentAssignments()
             semaphore.signal()
         }
         semaphore.wait()
@@ -308,7 +308,7 @@ import UIKit
         let semaphore = DispatchSemaphore(value: 0)
         var result: String?
         Task {
-            result = await sdk.getLastRawConfigResponse()
+            result = await self.sdk.getLastRawConfigResponse()
             semaphore.signal()
         }
         semaphore.wait()
@@ -319,7 +319,7 @@ import UIKit
         let semaphore = DispatchSemaphore(value: 0)
         var result: [ProviderPlanEntry] = []
         Task {
-            result = await sdk.getProviderPlan()
+            result = await self.sdk.getProviderPlan()
             semaphore.signal()
         }
         semaphore.wait()
@@ -343,7 +343,7 @@ import UIKit
         let semaphore = DispatchSemaphore(value: 0)
         var result: String?
         Task {
-            result = await sdk.getLastConfigSource()
+            result = await self.sdk.getLastConfigSource()
             semaphore.signal()
         }
         semaphore.wait()
@@ -354,7 +354,7 @@ import UIKit
         let semaphore = DispatchSemaphore(value: 0)
         var result: String = ""
         Task {
-            result = await sdk.getConfigRequestPreview(clientId: clientId, appId: appId?.isEmpty == true ? nil : appId)
+            result = await self.sdk.getConfigRequestPreview(clientId: clientId, appId: appId?.isEmpty == true ? nil : appId)
             semaphore.signal()
         }
         semaphore.wait()
@@ -368,21 +368,21 @@ import UIKit
         guard !sanitizedKey.isEmpty else { return }
         let sanitizedValue = value?.trimmingCharacters(in: .whitespacesAndNewlines)
         let finalValue = sanitizedValue?.isEmpty == true ? nil : sanitizedValue
-        DispatchQueue.main.async { Task { await sdk.setCustomProperty(sanitizedKey, value: finalValue) } }
+        DispatchQueue.main.async { Task { await self.sdk.setCustomProperty(sanitizedKey, value: finalValue) } }
     }
 
     @objc public func removeCustomProperty(key: String) {
-        DispatchQueue.main.async { Task { await sdk.removeCustomProperty(key) } }
+        DispatchQueue.main.async { Task { await self.sdk.removeCustomProperty(key) } }
     }
 
     @objc public func clearCustomProperties() {
-        DispatchQueue.main.async { Task { await sdk.clearCustomProperties() } }
+        DispatchQueue.main.async { Task { await self.sdk.clearCustomProperties() } }
     }
 
     @objc public func setCustomPropertiesFromJson(json: String) {
         guard let data = json.data(using: .utf8),
               let dict = try? JSONSerialization.jsonObject(with: data) as? [String: String] else { return }
-        DispatchQueue.main.async { Task { await sdk.setCustomProperties(dict) } }
+        DispatchQueue.main.async { Task { await self.sdk.setCustomProperties(dict) } }
     }
 
     // MARK: - Public API: Privacy
@@ -393,7 +393,7 @@ import UIKit
         let usPrivacy = usPrivacyString?.isEmpty == true ? nil : usPrivacyString
         DispatchQueue.main.async {
             Task {
-                await sdk.setPrivacy(
+                await self.sdk.setPrivacy(
                     tcfConsentString: tcf,
                     usPrivacyString: usPrivacy,
                     subjectToGdpr: subjectToGdpr,
@@ -408,11 +408,11 @@ import UIKit
 
     @objc public func setAdvertisingId(_ advertisingId: String?) {
         let adId = advertisingId?.isEmpty == true ? nil : advertisingId
-        DispatchQueue.main.async { Task { await sdk.setAdvertisingId(adId) } }
+        DispatchQueue.main.async { Task { await self.sdk.setAdvertisingId(adId) } }
     }
 
     @objc public func setHasAdvertisingId(_ has: Bool) {
-        DispatchQueue.main.async { Task { await sdk.setHasAdvertisingId(has) } }
+        DispatchQueue.main.async { Task { await self.sdk.setHasAdvertisingId(has) } }
     }
 
     // MARK: - Public API: Debug
@@ -422,14 +422,14 @@ import UIKit
         // which crashes when accessing UserDefaults from a concurrent queue.
         // The SDK core still accepts the flag; the wrapper avoids the
         // DebugPanel path that is not thread-safe in the current SDK version.
-        DispatchQueue.main.async { Task { await sdk.setDebuggingEnabled(enabled) } }
+        DispatchQueue.main.async { Task { await self.sdk.setDebuggingEnabled(enabled) } }
     }
 
     @objc public func isDebuggingEnabled() -> Bool {
         let semaphore = DispatchSemaphore(value: 0)
         var result = false
         Task {
-            result = await sdk.isDebuggingEnabled()
+            result = await self.sdk.isDebuggingEnabled()
             semaphore.signal()
         }
         semaphore.wait()
@@ -462,7 +462,7 @@ import UIKit
                         environment = .live
                     }
                 }
-                await sdk.setEnvironment(environment)
+                await self.sdk.setEnvironment(environment)
             }
         }
     }
