@@ -265,7 +265,7 @@ import UIKit
 
     @objc public func getLastExperimentAssignments() -> String {
         let semaphore = DispatchSemaphore(value: 0)
-        var result: [ExperimentAssignment] = []
+        var result: [OfferwallSdk.ExperimentAssignment] = []
         Task {
             result = await sdk.getLastExperimentAssignments()
             semaphore.signal()
