@@ -132,9 +132,11 @@ final class DebugPanelCoordinator {
         pill.show()
         floatingPill = pill
         
-        // Auto-hide after 5 seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5) { [weak self] in
-            self?.hideFloatingPill()
+        // Auto-hide after 10 seconds — only if this same pill is still showing
+        let pillRef = pill
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10) { [weak self] in
+            guard let self, self.floatingPill === pillRef else { return }
+            self.hideFloatingPill()
         }
     }
     

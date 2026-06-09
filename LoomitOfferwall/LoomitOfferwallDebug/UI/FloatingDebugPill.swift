@@ -25,11 +25,16 @@ final class FloatingDebugPill {
         
         let window = UIWindow(windowScene: scene)
         window.windowLevel = .statusBar + 1
-        window.makeKeyAndVisible()
+        window.backgroundColor = .clear
+        // A transparent root VC is required for the window to receive and forward touch events
+        let rootVC = UIViewController()
+        rootVC.view.backgroundColor = .clear
+        window.rootViewController = rootVC
+        window.isHidden = false
         self.window = window
         
         let pillView = createPillView(in: scene.screen.bounds)
-        window.addSubview(pillView)
+        rootVC.view.addSubview(pillView)
         self.pillView = pillView
         
         // Animate in from right
