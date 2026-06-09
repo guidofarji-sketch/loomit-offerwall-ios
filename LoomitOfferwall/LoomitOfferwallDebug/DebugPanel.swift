@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import LoomitOfferwallCore
 
 /// Coordinador principal de la Debugging Suite.
 /// Se activa automáticamente cuando debugging está habilitado.
@@ -52,6 +53,13 @@ public final class DebugPanel {
         return shared.collector
     }
     
+    /// Llamar desde motionEnded del ViewController para mostrar la pill flotante.
+    /// No abre el panel directamente — el usuario debe tappear la pill.
+    public static func handleShake() {
+        guard shared.isEnabled else { return }
+        shared.coordinator?.showFloatingPill()
+    }
+
     /// Muestra el debug panel inmediatamente (para botón manual)
     public static func show(from viewController: UIViewController) {
         guard shared.isEnabled else { return }
@@ -113,7 +121,7 @@ final class DebugPanelCoordinator {
         hideFloatingPill()
     }
     
-    private func showFloatingPill() {
+    func showFloatingPill() {
         guard floatingPill == nil else { return }
         
         let pill = FloatingDebugPill()

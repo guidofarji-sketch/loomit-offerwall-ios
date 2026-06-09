@@ -202,7 +202,8 @@ public actor OfferwallSdk {
     private static let AVAILABILITY_DEBOUNCE_MS: TimeInterval = 1.5
 
     /// Tiempo máximo de espera por providers lentos.
-    private static let CYCLE_MAX_WAIT_MS: TimeInterval = 3.0
+    /// 8s para absorber providers lentos en device real (ej: Tapjoy tarda ~5s en contentIsReady).
+    private static let CYCLE_MAX_WAIT_MS: TimeInterval = 8.0
 
     /// Production logger (se construye lazy luego del primer fetchConfig).
     private var productionLogger: ProductionLogger?
