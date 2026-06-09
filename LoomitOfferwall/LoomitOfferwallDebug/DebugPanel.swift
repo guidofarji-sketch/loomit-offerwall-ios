@@ -126,8 +126,11 @@ final class DebugPanelCoordinator {
         
         let pill = FloatingDebugPill()
         pill.onTap = { [weak self] in
+            // Capture topVC BEFORE hiding the pill — hiding destroys its UIWindow
+            // which changes what topViewController() returns.
+            let topVC = UIApplication.shared.topViewController()
             self?.hideFloatingPill()
-            self?.showDebugPanel(from: nil)
+            self?.showDebugPanel(from: topVC)
         }
         pill.show()
         floatingPill = pill
@@ -174,13 +177,15 @@ final class DebugPanelCoordinator {
 
 extension UIApplication {
     func topViewController() -> UIViewController? {
-        guard let window = connectedScenes
+        // Find the main app window at normal level — ignore overlay windows
+        // (e.g. the pill's UIWindow at .statusBar+1) so we present on the real VC.
+        let allWindows = connectedScenes
             .compactMap({ $0 as? UIWindowScene })
             .flatMap({ $0.windows })
-            .first(where: { $0.isKeyWindow }) else {
-            return nil
-        }
-        return window.rootViewController?.topMostViewController()
+        let mainWindow = allWindows
+            .filter({ !$0.isHidden && $0.windowLevel == .normal })
+            .first ?? allWindows.first(where: { $0.isKeyWindow })
+        return mainWindow?.rootViewController?.topMostViewController()
     }
 }
 

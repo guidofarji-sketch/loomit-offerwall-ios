@@ -71,24 +71,20 @@ final class FloatingDebugPill {
             width: pillWidth,
             height: pillHeight
         ))
-        container.backgroundColor = UIColor.systemIndigo.withAlphaComponent(0.9)
+        container.backgroundColor = UIColor(red: 0.1, green: 0.1, blue: 0.12, alpha: 0.95)
         container.layer.cornerRadius = pillHeight / 2
         container.layer.shadowColor = UIColor.black.cgColor
         container.layer.shadowOffset = CGSize(width: 0, height: 2)
-        container.layer.shadowRadius = 4
-        container.layer.shadowOpacity = 0.3
+        container.layer.shadowRadius = 6
+        container.layer.shadowOpacity = 0.4
         
-        let icon = UIImageView(image: UIImage(systemName: "ladybug.fill"))
-        icon.tintColor = .white
-        icon.frame = CGRect(x: 10, y: 10, width: 20, height: 20)
-        icon.contentMode = .scaleAspectFit
+        let loomitGreen = UIColor(red: 0, green: 1, blue: 0.741, alpha: 1) // #00FFBD
+        let label = UILabel(frame: CGRect(x: 0, y: 0, width: pillWidth, height: pillHeight))
+        label.text = "loomit"
+        label.font = .systemFont(ofSize: 15, weight: .bold)
+        label.textColor = loomitGreen
+        label.textAlignment = .center
         
-        let label = UILabel(frame: CGRect(x: 36, y: 0, width: 38, height: pillHeight))
-        label.text = "Debug"
-        label.font = .systemFont(ofSize: 13, weight: .semibold)
-        label.textColor = .white
-        
-        container.addSubview(icon)
         container.addSubview(label)
         
         return container
