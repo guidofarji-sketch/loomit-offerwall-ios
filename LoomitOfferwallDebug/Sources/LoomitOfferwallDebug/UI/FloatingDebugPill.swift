@@ -25,11 +25,11 @@ final class FloatingDebugPill {
         
         let window = UIWindow(windowScene: scene)
         window.windowLevel = .statusBar + 1
+        window.makeKeyAndVisible()
         self.window = window
         
-        let pillView = createPillView()
+        let pillView = createPillView(in: scene.screen.bounds)
         window.addSubview(pillView)
-        window.isHidden = false
         self.pillView = pillView
         
         // Animate in from right
@@ -57,11 +57,17 @@ final class FloatingDebugPill {
         }
     }
     
-    private func createPillView() -> UIView {
-        let container = UIView()
-        container.translatesAutoresizingMaskIntoConstraints = false
+    private func createPillView(in screenBounds: CGRect) -> UIView {
+        let pillWidth: CGFloat = 80
+        let pillHeight: CGFloat = 40
+        let container = UIView(frame: CGRect(
+            x: screenBounds.width - pillWidth - 10,
+            y: screenBounds.height / 2 - pillHeight / 2,
+            width: pillWidth,
+            height: pillHeight
+        ))
         container.backgroundColor = UIColor.systemIndigo.withAlphaComponent(0.9)
-        container.layer.cornerRadius = 20
+        container.layer.cornerRadius = pillHeight / 2
         container.layer.shadowColor = UIColor.black.cgColor
         container.layer.shadowOffset = CGSize(width: 0, height: 2)
         container.layer.shadowRadius = 4
@@ -69,38 +75,16 @@ final class FloatingDebugPill {
         
         let icon = UIImageView(image: UIImage(systemName: "ladybug.fill"))
         icon.tintColor = .white
-        icon.translatesAutoresizingMaskIntoConstraints = false
+        icon.frame = CGRect(x: 10, y: 10, width: 20, height: 20)
         icon.contentMode = .scaleAspectFit
         
-        let label = UILabel()
+        let label = UILabel(frame: CGRect(x: 36, y: 0, width: 38, height: pillHeight))
         label.text = "Debug"
-        label.font = .systemFont(ofSize: 14, weight: .semibold)
+        label.font = .systemFont(ofSize: 13, weight: .semibold)
         label.textColor = .white
-        label.translatesAutoresizingMaskIntoConstraints = false
         
         container.addSubview(icon)
         container.addSubview(label)
-        
-        // Position at right center of screen
-        if let window = window {
-            container.frame = CGRect(
-                x: window.bounds.width - 90,
-                y: window.bounds.height / 2 - 20,
-                width: 80,
-                height: 40
-            )
-        }
-        
-        NSLayoutConstraint.activate([
-            icon.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 10),
-            icon.centerYAnchor.constraint(equalTo: container.centerYAnchor),
-            icon.widthAnchor.constraint(equalToConstant: 20),
-            icon.heightAnchor.constraint(equalToConstant: 20),
-            
-            label.leadingAnchor.constraint(equalTo: icon.trailingAnchor, constant: 6),
-            label.centerYAnchor.constraint(equalTo: container.centerYAnchor),
-            label.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -10)
-        ])
         
         return container
     }
